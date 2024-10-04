@@ -1,0 +1,19 @@
+Olá professor, primeiramente gostaria de falar que achei muito interessante o
+trabalho e de como se desenvolve ele.
+A principal dificuldade e provavelmente o maior tempo gasto foi com leitura e
+escrita de arquivos em C, acho que um ponto que poderia ser comentado em sala
+é sobre a distancia de edição, já que tentei fazer sozinho mas como gastei 
+muito tempo em como trabalhar com arquivos, sendo necessário buscar ajuda da
+internet o que me apresentou Distância Levenshtein, foi interessante ver como é
+transformar uma parte teórica da matemática em código.
+Sobre bugs acabei conversando com você sobre boiardes estar sendo apresentado
+como resposta, e você falou que isso estava errado no enunciado do trabalho
+então acabei não mexendo nisso, de resto acho que o principal bug que teve 
+e corrigi foi sobre o MAX_TAM_PALAVRA, onde estava aceitando string maiores
+até MAX_TAM_PALAVRA+5 e se chegasse até MAX_TAM_PALAVRA+6 dava core dump,
+sendo assim coloquei para ignorar strings maior que MAX_TAM_PALAVRA e
+limpasse o buffer para caso tivesse algo após ele para não ser adicionado de
+forma errada na Trie (que era outro bug). No demais não achei mais bugs para
+arrumar.
+Por fim gostaria de agradecer pela oportunidade de aplicar os conhecimentos de
+alg3 de forma pratica.

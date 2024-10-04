@@ -1,0 +1,7 @@
+0 Alo
+1 Salve
+2 tanto
+3 faz
+4 oloco
+5 paje
+6 mago
