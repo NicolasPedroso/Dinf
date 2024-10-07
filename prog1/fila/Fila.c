@@ -27,7 +27,7 @@ struct fila criaStructFila(int x){
 }
 
 bool isEmptyFila(struct fila f){
-    if (f.inicio == f.fim ) return true;
+    if (f.tamanho == 0 ) return true;
 }
 
 bool isFullFila(struct fila f){
