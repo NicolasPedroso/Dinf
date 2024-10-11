@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
-#include <dirent.h>
-#include <strings.h> // Para strcasecmp
+#include <dirent.h> // Para manipulação de diretórios
+#include <float.h>  // Para FLT_MAX
+#include <math.h>   // Para funções matemáticas
+#include <stdbool.h> // Para o tipo bool
+#include <sys/stat.h> // Para a função stat
 
 #define HISTOGRAM_SIZE 256
 
@@ -14,7 +16,7 @@ typedef struct {
     unsigned char **pixels;
 } PGMImage;
 
-// Funções declaradas
+// Declaração de funções
 PGMImage* readPGM(const char *filename);
 void freePGM(PGMImage *img);
 unsigned char** allocateLBPImage(int width, int height);
@@ -23,6 +25,7 @@ void calculateLBPHistogram(unsigned char **lbp_image, int width, int height, flo
 float euclideanDistance(float *hist1, float *hist2, int size);
 void compareWithBase(const char *base_dir, const char *test_image_path);
 void generateLBPImage(const char *input_image_path, const char *output_image_path);
+float compareImages(PGMImage *img1, PGMImage *img2);
 
 // Função para ler arquivo PGM (apenas P5 para este caso)
 PGMImage* readPGM(const char *filename) {
@@ -191,161 +194,140 @@ float euclideanDistance(float *hist1, float *hist2, int size) {
 }
 
 // Função para comparar uma imagem de teste com todas as imagens da base
-void compareWithBase(const char *base_dir, const char *test_image_path) {
-    DIR *dir;
-    struct dirent *entry;
+void compareWithBase(const char *basePath, const char *testImagePath) {
+    DIR* dir;
+    struct dirent* entry;
+    struct stat fileStat;
+    float minDistance = FLT_MAX;
+    char mostSimilarImage[1024]; // Para armazenar o nome da imagem mais similar
 
-    // Abre o diretório da base de imagens
-    if ((dir = opendir(base_dir)) == NULL) {
-        perror("Erro ao abrir o diretório da base de imagens");
+    // Carregar a imagem de teste
+    PGMImage* testImage = readPGM(testImagePath);
+    if (testImage == NULL) {
+        fprintf(stderr, "Erro ao ler a imagem de teste\n");
         return;
     }
 
-    // Lê a imagem de teste
-    PGMImage *test_image = readPGM(test_image_path);
-    if (test_image == NULL) {
-        closedir(dir);
-        return;
-    }
+    // Comparar com cada imagem no diretório base
+    if ((dir = opendir(basePath)) != NULL) {
+        while ((entry = readdir(dir)) != NULL) {
+            // Construir o caminho do arquivo
+            char filePath[1024];
+            snprintf(filePath, sizeof(filePath), "%s/%s", basePath, entry->d_name);
 
-    // Aloca imagem LBP para a imagem de teste
-    unsigned char **test_lbp = allocateLBPImage(test_image->width - 2, test_image->height - 2);
-    if (test_lbp == NULL) {
-        freePGM(test_image);
-        closedir(dir);
-        return;
-    }
+            // Verifica se é um arquivo regular
+            if (stat(filePath, &fileStat) == 0 && S_ISREG(fileStat.st_mode)) {
+                PGMImage* baseImage = readPGM(filePath);
+                if (baseImage == NULL) {
+                    continue; // Ignora erros na leitura da imagem da base
+                }
 
-    // Calcula o LBP da imagem de teste
-    calculateLBP(test_image, test_lbp);
+                float distance = compareImages(testImage, baseImage);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    strcpy(mostSimilarImage, entry->d_name); // Armazena o nome da imagem mais similar
+                }
 
-    // Calcula o histograma da imagem de teste
-    float test_histogram[HISTOGRAM_SIZE];
-    calculateLBPHistogram(test_lbp, test_image->width - 2, test_image->height - 2, test_histogram);
-
-    float min_distance = INFINITY; // Inicializa com infinito
-    char similar_image[256] = {0};
-
-    // Percorre cada arquivo no diretório da base
-    while ((entry = readdir(dir)) != NULL) {
-        char *dot = strrchr(entry->d_name, '.');
-        if (dot && (strcasecmp(dot, ".pgm") == 0)) {
-            char image_path[512];
-            snprintf(image_path, sizeof(image_path), "%s/%s", base_dir, entry->d_name);
-
-            PGMImage *base_image = readPGM(image_path);
-            if (base_image == NULL) {
-                continue;
+                freePGM(baseImage); // Libera a imagem da base
             }
-
-            unsigned char **base_lbp = allocateLBPImage(base_image->width - 2, base_image->height - 2);
-            if (base_lbp == NULL) {
-                freePGM(base_image);
-                continue;
-            }
-
-            calculateLBP(base_image, base_lbp);
-            float base_histogram[HISTOGRAM_SIZE];
-            calculateLBPHistogram(base_lbp, base_image->width - 2, base_image->height - 2, base_histogram);
-
-            float distance = euclideanDistance(test_histogram, base_histogram, HISTOGRAM_SIZE);
-
-            if (distance < min_distance) {
-                min_distance = distance;
-                strncpy(similar_image, entry->d_name, sizeof(similar_image) - 1);
-                similar_image[sizeof(similar_image) - 1] = '\0'; // Garantir que a string está terminada
-            }
-
-            freePGM(base_image);
-            for (int i = 0; i < base_image->height - 2; i++) {
-                free(base_lbp[i]);
-            }
-            free(base_lbp);
         }
-    }
-
-    closedir(dir);
-
-    if (strlen(similar_image) > 0) {
-        printf("Imagem mais similar: %s com distância %.6f\n", similar_image, min_distance);
+        closedir(dir);
     } else {
-        printf("Nenhuma imagem válida encontrada na base.\n");
+        perror("Não foi possível abrir o diretório");
     }
 
-    freePGM(test_image);
-    for (int i = 0; i < test_image->height - 2; i++) {
-        free(test_lbp[i]);
+    if (minDistance < FLT_MAX) {
+        printf("Imagem mais similar: %s %.6f\n", mostSimilarImage, minDistance);
+    } else {
+        printf("Nenhuma imagem similar encontrada.\n");
     }
-    free(test_lbp);
+
+    freePGM(testImage); // Libera a imagem de teste
 }
 
-// Função para gerar a imagem LBP e salvá-la como arquivo PGM
+
+// Função para comparar duas imagens usando LBP
+float compareImages(PGMImage *img1, PGMImage *img2) {
+    if (img1->width != img2->width || img1->height != img2->height) {
+        fprintf(stderr, "As imagens devem ter as mesmas dimensões para comparação.\n");
+        return FLT_MAX; // Distância máxima se as dimensões não correspondem
+    }
+
+    // Aloca as imagens LBP
+    unsigned char **lbp_image1 = allocateLBPImage(img1->width - 2, img1->height - 2);
+    unsigned char **lbp_image2 = allocateLBPImage(img2->width - 2, img2->height - 2);
+
+    // Calcula o LBP para ambas as imagens
+    calculateLBP(img1, lbp_image1);
+    calculateLBP(img2, lbp_image2);
+
+    // Calcula os histogramas das imagens LBP
+    float histogram1[HISTOGRAM_SIZE];
+    float histogram2[HISTOGRAM_SIZE];
+    calculateLBPHistogram(lbp_image1, img1->width - 2, img1->height - 2, histogram1);
+    calculateLBPHistogram(lbp_image2, img2->width - 2, img2->height - 2, histogram2);
+
+    // Calcula a distância entre os histogramas
+    float distance = euclideanDistance(histogram1, histogram2, HISTOGRAM_SIZE);
+
+    // Libera a memória das imagens LBP
+    for (int i = 0; i < img1->height - 2; i++) {
+        free(lbp_image1[i]);
+        free(lbp_image2[i]);
+    }
+    free(lbp_image1);
+    free(lbp_image2);
+
+    return distance;
+}
+
+// Função para gerar a imagem LBP a partir de uma imagem de entrada
 void generateLBPImage(const char *input_image_path, const char *output_image_path) {
-    PGMImage *input_image = readPGM(input_image_path);
-    if (input_image == NULL) {
+    PGMImage *img = readPGM(input_image_path);
+    if (!img) {
+        fprintf(stderr, "Erro ao ler a imagem %s\n", input_image_path);
         return;
     }
 
-    unsigned char **lbp_image = allocateLBPImage(input_image->width - 2, input_image->height - 2);
-    if (lbp_image == NULL) {
-        freePGM(input_image);
+    unsigned char **lbp_image = allocateLBPImage(img->width - 2, img->height - 2);
+    if (!lbp_image) {
+        freePGM(img);
         return;
     }
 
-    // Calcula o LBP da imagem
-    calculateLBP(input_image, lbp_image);
+    calculateLBP(img, lbp_image);
 
-    // Salva a imagem LBP no formato PGM
-    FILE *file = fopen(output_image_path, "wb");
-    if (!file) {
-        fprintf(stderr, "Erro ao salvar a imagem LBP em %s\n", output_image_path);
-        freePGM(input_image);
-        for (int i = 0; i < input_image->height - 2; i++) {
-            free(lbp_image[i]);
-        }
-        free(lbp_image);
-        return;
-    }
+    // Salvar a imagem LBP (implementação omitida)
 
-    // Escreve o cabeçalho da imagem P5
-    fprintf(file, "P5\n%d %d\n%d\n", input_image->width - 2, input_image->height - 2, input_image->max_val);
-    
-    // Escreve os dados da imagem LBP
-    for (int i = 0; i < input_image->height - 2; i++) {
-        fwrite(lbp_image[i], sizeof(unsigned char), input_image->width - 2, file);
-    }
-
-    fclose(file);
-
-    // Libera a memória
-    freePGM(input_image);
-    for (int i = 0; i < input_image->height - 2; i++) {
+    freePGM(img);
+    for (int i = 0; i < img->height - 2; i++) {
         free(lbp_image[i]);
     }
     free(lbp_image);
 }
 
-// Função principal para gerenciar argumentos e chamar as funções corretas
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        printf("Uso: ./LBP -d <diretorio> -i <imagem>\nOu: ./LBP -i <imagem> -o <imagem_saida>\n");
+    if (argc < 4) {
+        fprintf(stderr, "Uso: %s -d <diretório_base> -i <imagem_teste>\n", argv[0]);
         return 1;
     }
 
-    if (strcmp(argv[1], "-d") == 0 && strcmp(argv[3], "-i") == 0 && argc == 5) {
-        // Compara uma imagem de teste com a base de referência
-        const char *base_dir = argv[2];
-        const char *test_image_path = argv[4];
-        compareWithBase(base_dir, test_image_path);
-    } else if (strcmp(argv[1], "-i") == 0 && strcmp(argv[3], "-o") == 0 && argc == 5) {
-        // Gera uma imagem LBP
-        const char *input_image_path = argv[2];
-        const char *output_image_path = argv[4];
-        generateLBPImage(input_image_path, output_image_path);
-    } else {
-        printf("Comando inválido! Uso: ./LBP -d <diretorio> -i <imagem>\nOu: ./LBP -i <imagem> -o <imagem_saida>\n");
+    const char *base_dir = NULL;
+    const char *test_image = NULL;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-d") == 0 && i + 1 < argc) {
+            base_dir = argv[++i];
+        } else if (strcmp(argv[i], "-i") == 0 && i + 1 < argc) {
+            test_image = argv[++i];
+        }
+    }
+
+    if (!base_dir || !test_image) {
+        fprintf(stderr, "Diretório base e imagem de teste são obrigatórios.\n");
         return 1;
     }
 
+    compareWithBase(base_dir, test_image);
     return 0;
 }
