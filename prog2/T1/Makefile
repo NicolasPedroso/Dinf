@@ -1,13 +1,25 @@
-CC     = gcc
+#Nicoals Gabriel Ramos Pedroso GRR20204019
+
+CC = gcc
 CFLAGS = -std=c11 -Wall
+LIBS = -lm
 
-EXEC = LBP
-SRC = lbp.c
+TARGET = LBP
+OBJS = main.o pgm.o lbp.o
 
-all: $(EXEC)
+all: $(TARGET)
 
-$(EXEC): $(SRC)
-	$(CC) $(CFLAGS) -o $(EXEC) $(SRC) -lm
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
+
+main.o: main.c pgm.h lbp.h
+	$(CC) $(CFLAGS) -c main.c
+
+pgm.o: pgm.c pgm.h
+	$(CC) $(CFLAGS) -c pgm.c
+
+lbp.o: lbp.c lbp.h pgm.h
+	$(CC) $(CFLAGS) -c lbp.c
 
 clean:
-	rm -f $(EXEC)
+	rm -f $(TARGET) $(OBJS)
