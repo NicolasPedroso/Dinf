@@ -8,12 +8,21 @@
 #include <math.h>
 #include <sys/stat.h>
 
+
+/*Certo*/
 int compara(const void* n1, const void* n2) {
     int intN1 = *(int*)n1;
     int intN2 = *(int*)n2;
 
     return (intN1 - intN2);
 }
+
+/*Enviado
+int compara( int n1, int n2) {
+    if(n1 < n2) return n1;
+    else return n2;
+}
+*/
 
 /*Funcao para alocar a imagem LBP*/
 unsigned char** criaImageLBP(int largura, int altura) {
