@@ -35,9 +35,9 @@ int main(){
 		al_wait_for_event(queue, &event);																																						//Função que captura eventos da fila, inserindo os mesmos na variável de eventos
 		
 		if (event.type == 30){																																									//O evento tipo 30 indica um evento de relógio, ou seja, verificação se a tela deve ser atualizada (conceito de FPS)
-			al_clear_to_color(al_map_rgb(0, 0, 0));																																				//Substitui tudo que estava desenhado na tela por um fundo preto
-			al_draw_filled_rectangle(player_1->x-player_1->side/2, player_1->y-player_1->side/2, player_1->x+player_1->side/2, player_1->y+player_1->side/2, al_map_rgb(255, 0, 0));			//Insere o quadrado do primeiro jogador na tela (!)
-			al_draw_filled_rectangle(player_2->x-player_2->side/2, player_2->y-player_2->side/2, player_2->x+player_2->side/2, player_2->y+player_2->side/2, al_map_rgb(0, 0, 255));			//Insere o quadrado do segundo jogador na tela (!)
+			al_clear_to_color(al_map_rgb((rand()%255), (rand()%255), (rand()%255)));																																				//Substitui tudo que estava desenhado na tela por um fundo preto
+			al_draw_filled_rectangle(player_1->x-player_1->side/2, player_1->y-player_1->side/2, player_1->x+player_1->side/2, player_1->y+player_1->side/2, al_map_rgb(255, (rand()%255), (rand()%255)));			//Insere o quadrado do primeiro jogador na tela (!)
+			al_draw_filled_rectangle(player_2->x-player_2->side/2, player_2->y-player_2->side/2, player_2->x+player_2->side/2, player_2->y+player_2->side/2, al_map_rgb((rand()%255), (rand()%255), 255));			//Insere o quadrado do segundo jogador na tela (!)
     		al_flip_display();																																									//Insere as modificações realizadas nos buffers de tela
 		}
 		else if (event.type == 42) break;																																						//Evento de clique no "X" de fechamento da tela. Encerra o programa graciosamente.
