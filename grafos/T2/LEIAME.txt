@@ -1,0 +1,18 @@
+Nicolas Gabriel Ramos Pedroso
+
+GRR20204019
+
+Fiz uso da biblioteca string.h no rede_metabolica.c para ler o arquivo
+
+usei INT_MAX para ser um "infinito"
+
+usei id negativos para diferenciar os coponetes falsos 
+
+fiz uma funcao auxiliar para saber a quantidade de enzimas de uma reacao
+
+tinha um memory leak pois nao eh dado free na lista de substratos
+mudei a main por causa disso, mas eh possivel "resolver" na propria funcao
+deixei comentado ja que e mais gambiara do que uma solucao (linha 103 rede_metabolica.c)
+
+modifiquei o Makefile já que o make clean não remove os .o's do diretorio
+testei e nao remove outros arquivos
