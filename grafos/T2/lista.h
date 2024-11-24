@@ -11,12 +11,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define _ERRO_MALLOC_ 1
 
 // macros para cast de ponteiro de funcao:
 #define void_f_obj void(*)(obj)
 #define int_f_obj int(*)(obj)
+#define str_f_obj char*(*)(obj)
 
 typedef void *obj;
 typedef struct t_no *no;
@@ -58,11 +60,21 @@ void empilha(obj c, lista l);
 
 // devolve o conteudo com a chave <chave> e o mantem na lista
 // [a funcao <f_chave(c)> deve devolver a chave do objeto c]
-obj busca_chave(int chave, lista l, int f_chave(obj c));
+obj busca_chave_int(int chave, lista l, int f_chave(obj c));
+obj busca_chave_str(char *chave, lista l, char *f_chave(obj c));
 
 // devolve o conteudo com a chave <chave> e o remove da lista
 // [a funcao <f_chave(c)> deve devolver a chave do objeto c]
-obj remove_chave(int chave, lista l, int f_chave(obj c));
+obj remove_chave_int(int chave, lista l, int f_chave(obj c));
+obj remove_chave_str(char *chave, lista l, char *f_chave(obj c));
+
+// devolve o conteudo com a menor chave e o mantem na lista
+// [a funcao <f_chave(c)> deve devolver a chave do objeto c]
+obj busca_min(lista l, int f_chave(obj c));
+
+// devolve o conteudo com a menor chave e o remove da lista
+// [a funcao <f_chave(c)> deve devolver a chave do objeto c]
+obj remove_min(lista l, int f_chave(obj c));
 
 // imprime a lista
 // [a funcao <imprime(c)> deve imprimir o objeto c]

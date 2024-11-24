@@ -9,6 +9,7 @@
 #include "lista.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //---------------------------------------------------------
 // getters:
@@ -70,7 +71,7 @@ void empilha(obj c, lista l) {
 
 // devolve o conteudo com a chave <chave> e o mantem na lista
 // [a funcao <f_chave(c)> deve devolver a chave do objeto c]
-obj busca_chave(int chave, lista l, int f_chave(obj c)) {
+obj busca_chave_int(int chave, lista l, int f_chave(obj c)) {
   no n = primeiro_no(l);
   while (n && f_chave(conteudo(n)) != chave)
     n = proximo(n);
@@ -79,9 +80,18 @@ obj busca_chave(int chave, lista l, int f_chave(obj c)) {
   return NULL;
 }
 
+obj busca_chave_str(char *chave, lista l, char *f_chave(obj c)) {
+  no n = primeiro_no(l);
+  while (n && strcmp(f_chave(conteudo(n)), chave))
+    n = proximo(n);
+  if (n)
+    return conteudo(n);
+  return NULL;
+}
+
 // devolve o conteudo com a chave <chave> e o remove da lista
 // [a funcao <f_chave(c)> deve devolver a chave do objeto c]
-obj remove_chave(int chave, lista l, int f_chave(obj c)) {
+obj remove_chave_int(int chave, lista l, int f_chave(obj c)) {
   no n = primeiro_no(l);
   no aux = NULL;
   while (n && f_chave(conteudo(n)) != chave) {
@@ -99,11 +109,72 @@ obj remove_chave(int chave, lista l, int f_chave(obj c)) {
   return c;
 }
 
+obj remove_chave_str(char *chave, lista l, char *f_chave(obj c)) {
+  no n = primeiro_no(l);
+  no aux = NULL;
+  while (n && strcmp(f_chave(conteudo(n)), chave)) {
+    aux = n;
+    n = proximo(n);
+  }
+  if (!n)
+    return NULL;
+  if (aux)
+    aux->proximo = proximo(n);
+  else
+    l->primeiro_no = proximo(n);
+  obj c = conteudo(n);
+  free(n);
+  return c;
+}
+
+// devolve o conteudo com a menor chave e o mantem na lista
+// [a funcao <f_chave(c)> deve devolver a chave do objeto c]
+obj busca_min(lista l, int f_chave(obj c)) {
+  if (vazio(l))
+    return NULL;
+  no n = primeiro_no(l);
+  obj min = conteudo(n);
+  while (n) {
+    if (f_chave(conteudo(n)) < f_chave(min))
+      min = conteudo(n);
+    n = proximo(n);
+  }
+  return min;
+}
+
+// devolve o conteudo com a menor chave e o remove da lista
+// [a funcao <f_chave(c)> deve devolver a chave do objeto c]
+obj remove_min(lista l, int f_chave(obj c)) {
+  if (vazio(l))
+    return NULL;
+  no n = primeiro_no(l);
+  no aux = NULL;
+  
+  no min = n;
+  no min_aux = aux;
+  
+  while (n) {
+    if (f_chave(conteudo(n)) < f_chave(conteudo(min))) {
+      min = n;
+      min_aux = aux;
+    }
+    aux = n;
+    n = proximo(n);
+  }
+  if (min_aux)
+    min_aux->proximo = proximo(min);
+  else
+    l->primeiro_no = proximo(min);
+  obj c = conteudo(min);
+  free(min);
+  return c;
+}
+
 // imprime a lista
 // [a funcao <imprime(c)> deve imprimir o objeto c]
 void imprime_lista(lista l, void imprime_conteudo(obj c)) {
   for (no n = primeiro_no(l); n; n = proximo(n)) {
     imprime_conteudo(conteudo(n));
-    printf(" ");
+    //printf(" ");
   }
 }

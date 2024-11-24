@@ -2,12 +2,13 @@ CC     = gcc
 CFLAGS = -std=c11
 LFLAGS = -Wall
 
-OBJ = lista.o grafo.o testa_grafos.o
-PROG = testa_grafos
+PROG = analise
+OBJ = lista.o grafo.o rede_metabolica.o $(PROG).o
+
 
 .PHONY: clean purge all
 
-%.o: %.c lista.h grafo.h
+%.o: %.c lista.h grafo.h rede_metabolica.h
 	$(CC) -c $(CFLAGS) $<
 
 $(PROG): $(OBJ)
@@ -15,6 +16,7 @@ $(PROG): $(OBJ)
 
 clean:
 	@rm -f *~ *.bak
+	@rm -f *~ *.o
 
 purge:   clean
 	@rm -rf bin obj *.layout *.depend

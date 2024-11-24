@@ -1,7 +1,0 @@
-Recebe quantidade de vértices  do grafo
-Após recebe números (ID's) dos vértices gerando 1 ou mais aresta entre os dois (loops também são aceitos)
-O programa avisa quando um vértice não existente é usado
-Programa imprime os resultados após ler dois 0 (zeros)
-Alteração no print final do grafo para melhor entendimento
-Mudança no adiciona_aresta para pegar o grau dos vértices e atualizar os pesos das
-aresta já na lista 
