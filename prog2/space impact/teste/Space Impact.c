@@ -1,6 +1,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_ttf.h>
 
 #include "Jogador.h"
 
@@ -127,13 +128,20 @@ int main(){
 	
 	al_init();
 	al_init_primitives_addon();
+    al_init_font_addon();
+    al_init_ttf_addon();
 	
 	al_install_keyboard();
 
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-	ALLEGRO_FONT* font = al_create_builtin_font();
+    ALLEGRO_FONT *fontTTF = al_load_ttf_font("minecraft_font.ttf", 15, 0);
 	ALLEGRO_DISPLAY* disp = al_create_display(X_TELA, Y_TELA);
+    al_set_window_position(disp, 300 ,300);
+    al_set_window_title(disp, "Space Impact");
+    //al_set_display_icon(disp, path);
+
+
 
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_display_event_source(disp));
@@ -152,10 +160,10 @@ int main(){
 
 		if (p1k || p2k){
 			al_clear_to_color(al_map_rgb(0, 0, 0));
-			if (p2k && p1k) al_draw_text(font, al_map_rgb(255, 255, 255), X_TELA/2 - 40, Y_TELA/2-15, 0, "EMPATE!");
-			else if (p2k) al_draw_text(font, al_map_rgb(255, 0, 0), X_TELA/2 - 75, Y_TELA/2-15, 0, "JOGADOR 1 GANHOU!");
-			else if (p1k) al_draw_text(font, al_map_rgb(0, 0, 255), X_TELA/2 - 75, Y_TELA/2-15, 0, "JOGADOR 2 GANHOU!");
-			al_draw_text(font, al_map_rgb(255, 255, 255), X_TELA/2 - 110, Y_TELA/2+5, 0, "PRESSIONE ESPAÇO PARA SAIR");
+			if (p2k && p1k) al_draw_text(fontTTF, al_map_rgb(255, 255, 255), X_TELA/2 - 40, Y_TELA/2-15, 0, "EMPATE!");
+			else if (p2k) al_draw_text(fontTTF, al_map_rgb(255, 0, 0), X_TELA/2 - 75, Y_TELA/2-15, 0, "JOGADOR 1 GANHOU!");
+			else if (p1k) al_draw_text(fontTTF, al_map_rgb(0, 0, 255), X_TELA/2 - 75, Y_TELA/2-15, 0, "JOGADOR 2 GANHOU!");
+			al_draw_text(fontTTF, al_map_rgb(255, 255, 255), X_TELA/2 - 110, Y_TELA/2+5, 0, "PRESSIONE ESPACO PARA SAIR");
 			al_flip_display();
 
 			if ((event.type == 10) && (event.keyboard.keycode == 75)) break;
@@ -191,7 +199,7 @@ int main(){
 		}
 	}
 
-	al_destroy_font(font);
+	al_destroy_font(fontTTF);
 	al_destroy_display(disp);
 	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
