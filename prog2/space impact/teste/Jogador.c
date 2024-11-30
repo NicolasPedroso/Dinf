@@ -20,10 +20,10 @@ jogador* criaJogador(unsigned char lado, unsigned char face, unsigned short x, u
 
 void moveJogador(jogador *elemento, char passos, unsigned char trajetoria, unsigned short max_x, unsigned short max_y){
 
-	if (!trajetoria){ if ((elemento->x - passos*PASSO_JOGADOR) - elemento->lado/2 >= 0) elemento->x = elemento->x - passos*PASSO_JOGADOR;}
-	else if (trajetoria == 1){ if ((elemento->x + passos*PASSO_JOGADOR) + elemento->lado/2 <= max_x) elemento->x = elemento->x + passos*PASSO_JOGADOR;}
-	else if (trajetoria == 2){ if ((elemento->y - passos*PASSO_JOGADOR) - elemento->lado/2 >= 0) elemento->y = elemento->y - passos*PASSO_JOGADOR;}
-	else if (trajetoria == 3){ if ((elemento->y + passos*PASSO_JOGADOR) + elemento->lado/2 <= max_y) elemento->y = elemento->y + passos*PASSO_JOGADOR;}
+	if (!trajetoria){ if ((elemento->x - passos*VELOCIDADE_JOGADOR) - elemento->lado/2 >= 0) elemento->x = elemento->x - passos*VELOCIDADE_JOGADOR;}
+	else if (trajetoria == 1){ if ((elemento->x + passos*VELOCIDADE_JOGADOR) + elemento->lado/2 <= max_x) elemento->x = elemento->x + passos*VELOCIDADE_JOGADOR;}
+	else if (trajetoria == 2){ if ((elemento->y - passos*VELOCIDADE_JOGADOR) - elemento->lado/2 >= 0) elemento->y = elemento->y - passos*VELOCIDADE_JOGADOR;}
+	else if (trajetoria == 3){ if ((elemento->y + passos*VELOCIDADE_JOGADOR) + elemento->lado/2 <= max_y) elemento->y = elemento->y + passos*VELOCIDADE_JOGADOR;}
 }
 
 void jogadorAtira(jogador *elemento){

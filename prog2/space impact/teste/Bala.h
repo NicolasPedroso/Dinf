@@ -1,7 +1,7 @@
 #ifndef __BALA__
 #define __BALA__
 
-#define MOVI_BALA 5
+#define MOVI_BALA 25
 
 typedef struct {
 	unsigned short x;

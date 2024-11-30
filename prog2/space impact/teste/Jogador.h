@@ -4,7 +4,7 @@
 #include "Controle.h"
 #include "Pistola.h"
 
-#define PASSO_JOGADOR 10
+#define VELOCIDADE_JOGADOR 7	
 
 typedef struct {
 	unsigned char lado;

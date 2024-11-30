@@ -4,9 +4,11 @@
 #include <allegro5/allegro_ttf.h>
 
 #include "Jogador.h"
+#include "Inimigos.h"
 
-#define X_TELA 320
-#define Y_TELA 320
+#define X_TELA 800
+#define Y_TELA 400
+#define NUM_INIMIGOS 50
 
 unsigned char colisao2D(jogador *elemento_primeiro, jogador *elemento_segudo){
 
@@ -124,8 +126,18 @@ void atualizaPosicao(jogador *jogador1, jogador *jogador2){
 	atualizaBalas(jogador2);
 }
 
+void desenhaInimigos(inimigo *lista) {
+    for (inimigo *id = lista; id != NULL; id = id->prox) {
+        al_draw_filled_circle(id->x, id->y, 20, id->cor); // Desenha um círculo preenchido com a cor do inimigo
+    }
+}
+
+
 int main(){
 	
+	inimigo *inimigos = NULL;
+	int inimigos_ativos = 0;
+
 	al_init();
 	al_init_primitives_addon();
     al_init_font_addon();
@@ -134,18 +146,19 @@ int main(){
 	al_install_keyboard();
 
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
+	ALLEGRO_TIMER* timer_inimigos = al_create_timer(1.0 / 2.0); // Timer para gerar inimigos a cada 0.5s
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-    ALLEGRO_FONT *fontTTF = al_load_ttf_font("minecraft_font.ttf", 15, 0);
+    ALLEGRO_FONT *fontTTF = al_load_ttf_font("acessorios/minecraft_font.ttf", 15, 0);
 	ALLEGRO_DISPLAY* disp = al_create_display(X_TELA, Y_TELA);
     al_set_window_position(disp, 300 ,300);
     al_set_window_title(disp, "Space Impact");
     //al_set_display_icon(disp, path);
 
 
-
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_display_event_source(disp));
 	al_register_event_source(queue, al_get_timer_event_source(timer));
+	al_register_event_source(queue, al_get_timer_event_source(timer_inimigos));
 
 	jogador* jogador1 = criaJogador(20, 1, 10, Y_TELA/2, X_TELA, Y_TELA);
 	if (!jogador1) return 1;
@@ -154,10 +167,11 @@ int main(){
 
 	ALLEGRO_EVENT event;
 	al_start_timer(timer);
+	al_start_timer(timer_inimigos);
 	unsigned char p1k = 0, p2k = 0;
 	while(1){
 		al_wait_for_event(queue, &event);
-
+		
 		if (p1k || p2k){
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 			if (p2k && p1k) al_draw_text(fontTTF, al_map_rgb(255, 255, 255), X_TELA/2 - 40, Y_TELA/2-15, 0, "EMPATE!");
@@ -172,12 +186,24 @@ int main(){
 		else{
 			if (event.type == 30){
 				atualizaPosicao(jogador1, jogador2);
+				if (inimigos_ativos < NUM_INIMIGOS) {
+                    int tipo = rand() % 4; // Escolha aleatória de tipo de inimigo
+                	float x = X_TELA;
+                	float y = rand() % Y_TELA; // Posição aleatória na tela
+                	adicionaInimigo(&inimigos, tipo, x, y);
+                	inimigos_ativos++;
+                }
+				atualizaInimigos(inimigos, jogador1, jogador2);
 				p1k = veMorte(jogador2, jogador1);
 				p2k = veMorte(jogador1, jogador2);
 				al_clear_to_color(al_map_rgb(0, 0, 0));
 				al_draw_filled_rectangle(jogador1->x-jogador1->lado/2, jogador1->y-jogador1->lado/2, jogador1->x+jogador1->lado/2, jogador1->y+jogador1->lado/2, al_map_rgb(255, 0, 0));
 				al_draw_filled_rectangle(jogador2->x-jogador2->lado/2, jogador2->y-jogador2->lado/2, jogador2->x+jogador2->lado/2, jogador2->y+jogador2->lado/2, al_map_rgb(0, 0, 255));
-	    		for (bala *id = jogador1->arma->tiros; id != NULL; id = (bala*) id->prox) al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(255, 0, 0));
+	    		/*for (inimigo *id = inimigos; id != NULL; id = id->prox) {
+                	al_draw_filled_rectangle(id->x - id->lado / 2, id->y - id->lado / 2, id->x + id->lado / 2, id->y + id->lado / 2, al_map_rgb((rand()%255), (rand()%255), (rand()%255))); // Cor do inimigo
+           		}*/
+				desenhaInimigos(inimigos);
+				for (bala *id = jogador1->arma->tiros; id != NULL; id = (bala*) id->prox) al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(255, 0, 0));
 	    		if (jogador1->arma->tempo) jogador1->arma->tempo--;
 	    		for (bala *id = jogador2->arma->tiros; id != NULL; id = (bala*) id->prox) al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(0, 0, 255));
 	    		if (jogador2->arma->tempo) jogador2->arma->tempo--;
