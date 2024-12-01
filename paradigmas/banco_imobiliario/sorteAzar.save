@@ -1,0 +1,32 @@
+01; reves; "Sua empresa foi multada por poluir demais"; 200
+02; reves; "O dia de seu casamento chegou. Receba presentes."; 50
+03; reves; "Reformou sua casa."; 50 
+04; sorte; "Seu livro será publicado por m grande editora."; 50 
+05; especial; "Habeas Corpus utilize este cartão para se livrar da Detenção quando necessário.";
+06; especial; "Entre no camburão e vá para a Detenção (e sem reclamar!).";
+07; especial; "Vá até o início"; 200
+08; sorte; "Suas ações na Bolsa de valores estão em alta."; 100
+09; reves; "Você vai começar um curso de MBA e ganhou um bom desconto para pagamento á vista."; 20
+10; reves; "Féroas no campo com toda a família!"; 20
+11; sorte; "Recebeu o prêmio de "Profissional do Ano" e ganhou um carro."; 10
+12; especial; "Jogue os dados novamente e avance seu peão.";
+13; especial; "Compra livre Apresente este cartão a um jogador para comprar uma propriedade SEM construções pelo valor indicado no tabulereiro.";
+14; reves; "Sua empresa irá patrocinar uma expedição á Antartida"; 50
+15; sorte; "Vendeu parte de sua empresa para um investidor."; 75
+16; sorte; "Apostou no cavalo azarão vencedor do Grande Prêmio Brasil."; 100
+17; reves; "A falta de chuvas prejudicou a colheita."; 45
+18; sorte; "Recebeu uma herança inesperada."; 75
+19; reves; "Seu filho decidiu fazer intercâmbio."; 20
+20; sorte; "Sua casa será desapropriada para a construção do metrô. Ganhará uma gorda indenização."; 60
+21; sorte; "Venceu licitação pra uma grande obra."; 150
+22; sorte; "Seu iatr afundou, mas você tinha seguro!"; 25
+23; reves; "Seus funcionários entratam em greve, trazendo grandes prejuízos para a produção."; 30
+24; reves; "Comprou obra de arte falsificada."; 22
+25; especial; "Se tirou n° par na soma dos dados. Receba / Se tirou n° impar na soma dos dados. Pague"; 100
+26; reves; "Seu jatinho precisa de manutenção."; 9
+27; reves; "Renovou a frota de carros de sua empresa."; 100
+28; sorte; "Ganhou sozinho na loteria!"; 80
+29; reves; "Atualizou os computadores de sua empresa."; 30
+30; reves; "Um navio afundou com suas mercadorias e não tinha seguro."; 40
+31; reves; "Produção de leite de suas fazendas ficou abaixo da expectativa e terá de arcar com os prejuízos."; 60
+32; sorte; "Tirou 1° lugar no torneio de golfe"; 100
