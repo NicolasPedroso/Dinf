@@ -3,7 +3,7 @@
 
 bala* criaBala(unsigned short x, unsigned short y, unsigned char trajetoria, bala *prox){
 
-	if ((trajetoria < 0) || (trajetoria > 1)) return NULL;
+	if (trajetoria > 3) return NULL;
 
 	bala *novaBala = (bala*) malloc(sizeof(bala));
 	if (!novaBala) return NULL;
@@ -14,12 +14,25 @@ bala* criaBala(unsigned short x, unsigned short y, unsigned char trajetoria, bal
 	return novaBala;
 }
 
-void moveBala(bala *elementos){
-
-	for (bala *id = elementos; id != NULL; id = (bala*) id->prox){
-		if (!id->trajetoria) id->x = id->x - MOVI_BALA;
-		else id->x = id->x + MOVI_BALA;
-	}
+void moveBalas(bala *balas) {
+    for (bala *id = balas; id != NULL; id = (bala *) id->prox) {
+        switch (id->trajetoria) {
+            case DIRECAO_ESQUERDA:
+                id->x -= MOVI_BALA;
+                break;
+            case DIRECAO_DIREITA:
+                id->x += MOVI_BALA;
+                break;
+            case DIRECAO_CIMA:
+                id->y -= MOVI_BALA;
+                break;
+            case DIRECAO_BAIXO:
+                id->y += MOVI_BALA;
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void destroiBala(bala *elemento){

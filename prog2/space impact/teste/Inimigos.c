@@ -4,32 +4,32 @@
 void defineCorInimigo(inimigo *id) {
     switch (id->tipo) {
         case 0:
-            id->cor = al_map_rgb(255, 0, 0); // Vermelho para cometas
+            id->cor = al_map_rgb(255, 0, 0); /*Vermelho para cometas*/
             break;
         case 1:
-            id->cor = al_map_rgb(0, 255, 0); // Verde para o tipo 1
+            id->cor = al_map_rgb(0, 255, 0); /*Verde para o tipo 1*/
             break;
         case 2:
-            id->cor = al_map_rgb(0, 0, 255); // Azul para o tipo 2
+            id->cor = al_map_rgb(0, 0, 255); /*Azul para o tipo 2*/
             break;
         case 3:
-            id->cor = al_map_rgb(255, 255, 0); // Amarelo para o tipo 3
+            id->cor = al_map_rgb(255, 255, 0); /*Amarelo para o tipo 3*/
             break;
         default:
-            id->cor = al_map_rgb(255, 255, 255); // Branco para tipos desconhecidos
+            id->cor = al_map_rgb(255, 255, 255); /*Branco para tipos desconhecidos*/
             break;
     }
 }
 
 
-inimigo* criaInimigo(int tipo, float x, float y) {
+inimigo* criaInimigo(int tipo, int x, int y) {
     inimigo* novoInimigo = (inimigo*)malloc(sizeof(inimigo));
     if (!novoInimigo) return NULL;
 
     novoInimigo->x = x;
     novoInimigo->y = y;
     novoInimigo->vida = 5*tipo;
-    novoInimigo->lado = 20;
+    novoInimigo->lado = 7*tipo;
     novoInimigo->tipo = tipo;
     novoInimigo->prox = NULL;
 
@@ -107,6 +107,12 @@ void atualizaInimigos(inimigo *lista, jogador *jogador1, jogador *jogador2) {
                 // Lógica padrão, se necessário, quando o tipo não for reconhecido
                 break;
         }
+    }
+}
+
+void desenhaInimigos(inimigo *lista) {
+    for (inimigo *id = lista; id != NULL; id = id->prox) {
+        al_draw_filled_rectangle(id->x-id->lado/2, id->y-id->lado/2, id->x+id->lado/2, id->y+id->lado/2, id->cor);
     }
 }
 

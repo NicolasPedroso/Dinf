@@ -6,18 +6,15 @@
 #include "Jogador.h"
 #include "Inimigos.h"
 
+#define DIRECAO_ESQUERDA 0
+#define DIRECAO_DIREITA 1
+#define DIRECAO_CIMA 2
+#define DIRECAO_BAIXO 3
+
+
 #define X_TELA 800
 #define Y_TELA 400
 #define NUM_INIMIGOS 50
-
-unsigned char colisao2D(jogador *elemento_primeiro, jogador *elemento_segudo){
-
-	if ((((elemento_segudo->y-elemento_segudo->lado/2 >= elemento_primeiro->y-elemento_primeiro->lado/2) && (elemento_primeiro->y+elemento_primeiro->lado/2 >= elemento_segudo->y-elemento_segudo->lado/2)) ||
-		((elemento_primeiro->y-elemento_primeiro->lado/2 >= elemento_segudo->y-elemento_segudo->lado/2) && (elemento_segudo->y+elemento_segudo->lado/2 >= elemento_primeiro->y-elemento_primeiro->lado/2))) &&
-		(((elemento_segudo->x-elemento_segudo->lado/2 >= elemento_primeiro->x-elemento_primeiro->lado/2) && (elemento_primeiro->x+elemento_primeiro->lado/2 >= elemento_segudo->x-elemento_segudo->lado/2)) ||
-		((elemento_primeiro->x-elemento_primeiro->lado/2 >= elemento_segudo->x-elemento_segudo->lado/2) && (elemento_segudo->x+elemento_segudo->lado/2 >= elemento_primeiro->x-elemento_primeiro->lado/2)))) return 1;
-	else return 0;
-}
 
 unsigned char veMorte(jogador *assassino, jogador *vitima){
 
@@ -76,60 +73,58 @@ void atualizaBalas(jogador *jogador){
 void atualizaPosicao(jogador *jogador1, jogador *jogador2){
 
 	if (jogador1->controle->esquerda){
-		moveJogador(jogador1, 1, 0, X_TELA, Y_TELA);
-		if (colisao2D(jogador1, jogador2)) moveJogador(jogador1, -1, 0, X_TELA, Y_TELA);
+		moveJogador(jogador1, 1, DIRECAO_ESQUERDA, X_TELA, Y_TELA);
+		jogador1->face = DIRECAO_ESQUERDA;
+		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 0, X_TELA, Y_TELA);
 	}
 	if (jogador1->controle->direita){
-		moveJogador(jogador1, 1, 1, X_TELA, Y_TELA);
-		if (colisao2D(jogador1, jogador2)) moveJogador(jogador1, -1, 1, X_TELA, Y_TELA);
+		moveJogador(jogador1, 1, DIRECAO_DIREITA, X_TELA, Y_TELA);
+		jogador1->face = DIRECAO_DIREITA;
+		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 1, X_TELA, Y_TELA);
 	}
 	if (jogador1->controle->cima) {
-		moveJogador(jogador1, 1, 2, X_TELA, Y_TELA);
-		if (colisao2D(jogador1, jogador2)) moveJogador(jogador1, -1, 2, X_TELA, Y_TELA);
+		moveJogador(jogador1, 1, DIRECAO_CIMA, X_TELA, Y_TELA);
+		jogador1->face = DIRECAO_CIMA;
+		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 2, X_TELA, Y_TELA);
 	}
 	if (jogador1->controle->baixo){
-		moveJogador(jogador1, 1, 3, X_TELA, Y_TELA);
-		if (colisao2D(jogador1, jogador2)) moveJogador(jogador1, -1, 3, X_TELA, Y_TELA);
+		moveJogador(jogador1, 1, DIRECAO_BAIXO, X_TELA, Y_TELA);
+		jogador1->face = DIRECAO_BAIXO;
+		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 3, X_TELA, Y_TELA);
 	}
 	
 	if (jogador2->controle->esquerda){
 		moveJogador(jogador2, 1, 0, X_TELA, Y_TELA);
-		if (colisao2D(jogador2, jogador1)) moveJogador(jogador2, -1, 0, X_TELA, Y_TELA);
+		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 0, X_TELA, Y_TELA);
 	}
 	
 	if (jogador2->controle->direita){
 		moveJogador(jogador2, 1, 1, X_TELA, Y_TELA);
-		if (colisao2D(jogador2, jogador1)) moveJogador(jogador2, -1, 1, X_TELA, Y_TELA);
+		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 1, X_TELA, Y_TELA);
 	}
 	
 	if (jogador2->controle->cima){
 		moveJogador(jogador2, 1, 2, X_TELA, Y_TELA);
-		if (colisao2D(jogador2, jogador1)) moveJogador(jogador2, -1, 2, X_TELA, Y_TELA);
+		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 2, X_TELA, Y_TELA);
 	}
 	if (jogador2->controle->baixo){
 		moveJogador(jogador2, 1, 3, X_TELA, Y_TELA);
-		if (colisao2D(jogador2, jogador1)) moveJogador(jogador2, -1, 3, X_TELA, Y_TELA);
+		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 3, X_TELA, Y_TELA);
 	}
 	if (jogador1->controle->atira){
 		if (!jogador1->arma->tempo){
-			jogadorAtira(jogador1);
+			jogadorAtira(jogador1, jogador1->face);
 			jogador1->arma->tempo = REGARGA_PISTOLA;
 		} 
 	}
 	if (jogador2->controle->atira){
 		if (!jogador2->arma->tempo){
-			jogadorAtira(jogador2);
+			jogadorAtira(jogador2, jogador2->face);
 			jogador2->arma->tempo = REGARGA_PISTOLA;
 		}
 	}
-	atualizaBalas(jogador1);
-	atualizaBalas(jogador2);
-}
-
-void desenhaInimigos(inimigo *lista) {
-    for (inimigo *id = lista; id != NULL; id = id->prox) {
-        al_draw_filled_circle(id->x, id->y, 20, id->cor); // Desenha um círculo preenchido com a cor do inimigo
-    }
+	moveBalas(jogador1->arma->tiros);
+	moveBalas(jogador2->arma->tiros);
 }
 
 
@@ -149,8 +144,38 @@ int main(){
 	ALLEGRO_TIMER* timer_inimigos = al_create_timer(1.0 / 2.0); // Timer para gerar inimigos a cada 0.5s
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
     ALLEGRO_FONT *fontTTF = al_load_ttf_font("acessorios/minecraft_font.ttf", 15, 0);
-	ALLEGRO_DISPLAY* disp = al_create_display(X_TELA, Y_TELA);
-    al_set_window_position(disp, 300 ,300);
+	
+	/*Struct info*/
+	ALLEGRO_MONITOR_INFO info;
+
+	/*Resolucao do monitor do usuario*/
+	int resolucaoXComp, resolucaoYComp;
+
+	al_get_monitor_info(0, &info);
+
+	resolucaoXComp = info.x2 - info.x1;
+	resolucaoYComp = info.y2 - info.y1;
+
+	/*Seta o display disp*/
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
+	ALLEGRO_DISPLAY* disp = al_create_display(resolucaoXComp, resolucaoYComp);
+    
+	/*redimensionamento*/
+	float redimensaoX, redimensaoY;
+
+	redimensaoX = resolucaoXComp / (float) X_TELA;
+	redimensaoY = resolucaoYComp / (float) Y_TELA;
+
+	/*Funcoes de redimensao*/
+	ALLEGRO_TRANSFORM transformar;
+
+	al_identity_transform(&transformar);
+	al_scale_transform(&transformar, redimensaoX, redimensaoY);
+	al_use_transform(&transformar);
+	al_hide_mouse_cursor(disp);
+
+	
+	al_set_window_position(disp, 300 ,300);
     al_set_window_title(disp, "Space Impact");
     //al_set_display_icon(disp, path);
 

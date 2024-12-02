@@ -26,11 +26,38 @@ void moveJogador(jogador *elemento, char passos, unsigned char trajetoria, unsig
 	else if (trajetoria == 3){ if ((elemento->y + passos*VELOCIDADE_JOGADOR) + elemento->lado/2 <= max_y) elemento->y = elemento->y + passos*VELOCIDADE_JOGADOR;}
 }
 
-void jogadorAtira(jogador *elemento){
+unsigned char colisaoJogador(jogador *elemento_primeiro, jogador *elemento_segudo){
+
+	if ((((elemento_segudo->y-elemento_segudo->lado/2 >= elemento_primeiro->y-elemento_primeiro->lado/2) && (elemento_primeiro->y+elemento_primeiro->lado/2 >= elemento_segudo->y-elemento_segudo->lado/2)) ||
+		((elemento_primeiro->y-elemento_primeiro->lado/2 >= elemento_segudo->y-elemento_segudo->lado/2) && (elemento_segudo->y+elemento_segudo->lado/2 >= elemento_primeiro->y-elemento_primeiro->lado/2))) &&
+		(((elemento_segudo->x-elemento_segudo->lado/2 >= elemento_primeiro->x-elemento_primeiro->lado/2) && (elemento_primeiro->x+elemento_primeiro->lado/2 >= elemento_segudo->x-elemento_segudo->lado/2)) ||
+		((elemento_primeiro->x-elemento_primeiro->lado/2 >= elemento_segudo->x-elemento_segudo->lado/2) && (elemento_segudo->x+elemento_segudo->lado/2 >= elemento_primeiro->x-elemento_primeiro->lado/2)))) return 1;
+	else return 0;
+}
+
+void jogadorAtira(jogador *elemento, unsigned char trajetoria){
+
+	if (elemento == NULL) return;
+
 	bala *tiro;
 
-	if (!elemento->face) tiro = tiroPistola(elemento->x - elemento->lado/2, elemento->y, elemento->face, elemento->arma);
-	else if (elemento->face == 1) tiro = tiroPistola(elemento->x + elemento->lado/2, elemento->y, elemento->face, elemento->arma);
+	switch (trajetoria) {
+		case DIRECAO_ESQUERDA:
+        	tiro = tiroPistola(elemento->x - elemento->lado/2, elemento->y, elemento->face, elemento->arma);
+            break;
+        case DIRECAO_DIREITA:
+            tiro = tiroPistola(elemento->x + elemento->lado/2, elemento->y, elemento->face, elemento->arma);
+			break;
+        case DIRECAO_CIMA:
+            tiro = tiroPistola(elemento->x, elemento->y - elemento->lado/2, elemento->face, elemento->arma);
+            break;
+        case DIRECAO_BAIXO:
+            tiro = tiroPistola(elemento->x, elemento->y + elemento->lado/2, elemento->face, elemento->arma);
+            break;
+        default:
+            break;
+        }
+
 	if (tiro) elemento->arma->tiros = tiro;
 }
 

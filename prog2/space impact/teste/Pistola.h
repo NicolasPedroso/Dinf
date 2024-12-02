@@ -3,7 +3,10 @@
 
 #include "Bala.h"
 
-#define REGARGA_PISTOLA 10
+#define REGARGA_ESCOPETA 10
+#define REGARGA_PISTOLA 7
+#define REGARGA_METRALHADORA 5
+
 
 typedef struct {
 	unsigned char tempo;
