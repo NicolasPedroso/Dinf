@@ -6,127 +6,9 @@
 #include "Jogador.h"
 #include "Inimigos.h"
 
-#define DIRECAO_ESQUERDA 0
-#define DIRECAO_DIREITA 1
-#define DIRECAO_CIMA 2
-#define DIRECAO_BAIXO 3
-
-
 #define X_TELA 800
 #define Y_TELA 400
 #define NUM_INIMIGOS 50
-
-unsigned char veMorte(jogador *assassino, jogador *vitima){
-
-	bala *anterior = NULL;
-	for (bala *id = assassino->arma->tiros; id != NULL; id = (bala*) id->prox){
-		if ((id->x >= vitima->x - vitima->lado/2) && (id->x <= vitima->x + vitima->lado/2) &&
-		   (id->y >= vitima->y - vitima->lado/2) && (id->y <= vitima->y + vitima->lado/2)){
-			vitima->vida--;
-			if (vitima->vida){
-				if (anterior){
-					anterior->prox = id->prox;
-					destroiBala(id);
-					id = (bala*) anterior->prox;
-				}
-				else {
-					assassino->arma->tiros = (bala*) id->prox;
-					destroiBala(id);
-					id = assassino->arma->tiros;
-				}
-				return 0;
-			}
-			else return 1;
-		}
-		anterior = id;
-	}
-	return 0;
-}
-
-void atualizaBalas(jogador *jogador){
-	
-	bala *anterior = NULL;
-	for (bala *id = jogador->arma->tiros; id != NULL;){
-		if (!id->trajetoria) id->x -= MOVI_BALA;
-		else if (id->trajetoria == 1) id->x += MOVI_BALA;
-	
-		
-		if ((id->x < 0) || (id->x > X_TELA)){
-			if (anterior){
-				anterior->prox = id->prox;
-				destroiBala(id);
-				id = (bala*) anterior->prox;
-			}
-			else {
-				jogador->arma->tiros = (bala*) id->prox;
-				destroiBala(id);
-				id = jogador->arma->tiros;
-			}
-		}
-		else{
-			anterior = id;
-			id = (bala*) id->prox;
-		}
-	}
-}
-
-void atualizaPosicao(jogador *jogador1, jogador *jogador2){
-
-	if (jogador1->controle->esquerda){
-		moveJogador(jogador1, 1, DIRECAO_ESQUERDA, X_TELA, Y_TELA);
-		jogador1->face = DIRECAO_ESQUERDA;
-		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 0, X_TELA, Y_TELA);
-	}
-	if (jogador1->controle->direita){
-		moveJogador(jogador1, 1, DIRECAO_DIREITA, X_TELA, Y_TELA);
-		jogador1->face = DIRECAO_DIREITA;
-		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 1, X_TELA, Y_TELA);
-	}
-	if (jogador1->controle->cima) {
-		moveJogador(jogador1, 1, DIRECAO_CIMA, X_TELA, Y_TELA);
-		jogador1->face = DIRECAO_CIMA;
-		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 2, X_TELA, Y_TELA);
-	}
-	if (jogador1->controle->baixo){
-		moveJogador(jogador1, 1, DIRECAO_BAIXO, X_TELA, Y_TELA);
-		jogador1->face = DIRECAO_BAIXO;
-		if (colisaoJogador(jogador1, jogador2)) moveJogador(jogador1, -1, 3, X_TELA, Y_TELA);
-	}
-	
-	if (jogador2->controle->esquerda){
-		moveJogador(jogador2, 1, 0, X_TELA, Y_TELA);
-		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 0, X_TELA, Y_TELA);
-	}
-	
-	if (jogador2->controle->direita){
-		moveJogador(jogador2, 1, 1, X_TELA, Y_TELA);
-		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 1, X_TELA, Y_TELA);
-	}
-	
-	if (jogador2->controle->cima){
-		moveJogador(jogador2, 1, 2, X_TELA, Y_TELA);
-		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 2, X_TELA, Y_TELA);
-	}
-	if (jogador2->controle->baixo){
-		moveJogador(jogador2, 1, 3, X_TELA, Y_TELA);
-		if (colisaoJogador(jogador2, jogador1)) moveJogador(jogador2, -1, 3, X_TELA, Y_TELA);
-	}
-	if (jogador1->controle->atira){
-		if (!jogador1->arma->tempo){
-			jogadorAtira(jogador1, jogador1->face);
-			jogador1->arma->tempo = REGARGA_PISTOLA;
-		} 
-	}
-	if (jogador2->controle->atira){
-		if (!jogador2->arma->tempo){
-			jogadorAtira(jogador2, jogador2->face);
-			jogador2->arma->tempo = REGARGA_PISTOLA;
-		}
-	}
-	moveBalas(jogador1->arma->tiros);
-	moveBalas(jogador2->arma->tiros);
-}
-
 
 int main(){
 	
@@ -218,16 +100,14 @@ int main(){
                 	adicionaInimigo(&inimigos, tipo, x, y);
                 	inimigos_ativos++;
                 }
-				atualizaInimigos(inimigos, jogador1, jogador2);
-				p1k = veMorte(jogador2, jogador1);
-				p2k = veMorte(jogador1, jogador2);
+				atualizaInimigos(inimigos, jogador1);
+				p1k = veMortePVP(jogador2, jogador1);
+				p2k = veMortePVP(jogador1, jogador2);
 				al_clear_to_color(al_map_rgb(0, 0, 0));
 				al_draw_filled_rectangle(jogador1->x-jogador1->lado/2, jogador1->y-jogador1->lado/2, jogador1->x+jogador1->lado/2, jogador1->y+jogador1->lado/2, al_map_rgb(255, 0, 0));
 				al_draw_filled_rectangle(jogador2->x-jogador2->lado/2, jogador2->y-jogador2->lado/2, jogador2->x+jogador2->lado/2, jogador2->y+jogador2->lado/2, al_map_rgb(0, 0, 255));
-	    		/*for (inimigo *id = inimigos; id != NULL; id = id->prox) {
-                	al_draw_filled_rectangle(id->x - id->lado / 2, id->y - id->lado / 2, id->x + id->lado / 2, id->y + id->lado / 2, al_map_rgb((rand()%255), (rand()%255), (rand()%255))); // Cor do inimigo
-           		}*/
-				desenhaInimigos(inimigos);
+	    		desenhaInimigos(inimigos);
+				balasInimigos(inimigos);
 				for (bala *id = jogador1->arma->tiros; id != NULL; id = (bala*) id->prox) al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(255, 0, 0));
 	    		if (jogador1->arma->tempo) jogador1->arma->tempo--;
 	    		for (bala *id = jogador2->arma->tiros; id != NULL; id = (bala*) id->prox) al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(0, 0, 255));
