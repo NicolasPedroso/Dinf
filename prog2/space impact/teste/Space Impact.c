@@ -2,6 +2,9 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
+
+#include <stdio.h>
 
 #include "Jogador.h"
 #include "Inimigos.h"
@@ -15,11 +18,11 @@ int main(){
 	al_init_primitives_addon();
     al_init_font_addon();
     al_init_ttf_addon();
+	al_init_image_addon();
 	
 	al_install_keyboard();
 
 	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
-	ALLEGRO_TIMER* timer_inimigos = al_create_timer(1.0 / 2.0); // Timer para gerar inimigos a cada 0.5s
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
     ALLEGRO_FONT *fontTTF = al_load_ttf_font("acessorios/minecraft_font.ttf", 15, 0);
 	
@@ -57,11 +60,15 @@ int main(){
     al_set_window_title(disp, "Space Impact");
     //al_set_display_icon(disp, path);
 
+	/*Imagens e derivados*/
+	ALLEGRO_BITMAP *jogadorEsquerda = al_load_bitmap("acessorios/jogador_esquerda.png");
+	ALLEGRO_BITMAP *jogadorDireita = al_load_bitmap("acessorios/jogador_direita.png");
+	ALLEGRO_BITMAP *jogadorCima = al_load_bitmap("acessorios/jogador_cima.png");
+	ALLEGRO_BITMAP *jogadorBaixo = al_load_bitmap("acessorios/jogador_baixo.png");
 
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_display_event_source(disp));
 	al_register_event_source(queue, al_get_timer_event_source(timer));
-	al_register_event_source(queue, al_get_timer_event_source(timer_inimigos));
 
 	jogador* jogador1 = criaJogador(20, 1, 10, Y_TELA/2, X_TELA, Y_TELA);
 	if (!jogador1) return 1;
@@ -70,7 +77,6 @@ int main(){
 
 	ALLEGRO_EVENT event;
 	al_start_timer(timer);
-	al_start_timer(timer_inimigos);
 	unsigned char p1k = 0, p2k = 0;
 	unsigned char vivo = 0;
 	
@@ -80,12 +86,12 @@ int main(){
     	if (vivo) {
         	al_clear_to_color(al_map_rgb(0, 0, 0));
         	al_draw_text(fontTTF, al_map_rgb(12, 238, 26), X_TELA / 2 - 75, Y_TELA / 2 - 15, 0, "MORREU PROS MOBS RUIM!");
-       	 al_draw_text(fontTTF, al_map_rgb(12, 238, 26), X_TELA / 2 - 110, Y_TELA / 2 + 5, 0, "PRESSIONE ESPACO PARA SAIR");
+       	 	al_draw_text(fontTTF, al_map_rgb(12, 238, 26), X_TELA / 2 - 110, Y_TELA / 2 + 5, 0, "PRESSIONE ESPACO PARA SAIR");
         	al_flip_display();
         
 			if (event.type == 10 && event.keyboard.keycode == ALLEGRO_KEY_R) vivo = 0;
         	if ((event.type == 10 && event.keyboard.keycode == 75) || (event.type == 42)) break;
-    	}
+		}
     	else if (p1k || p2k) {
         	al_clear_to_color(al_map_rgb(0, 0, 0));
         	if (p2k && p1k) {
@@ -101,7 +107,7 @@ int main(){
         	if ((event.type == 10 && event.keyboard.keycode == 75) || (event.type == 42)) break;
     	}
     	else {
-        	if (event.type == 30) {
+			if (event.type == 30) {
             	al_clear_to_color(al_map_rgb(0, 0, 0)); // Limpando a tela apenas uma vez por iteração
 	            atualizaPosicao(jogador1, jogador2);
     	        if (inimigos_ativos < 500 /* MAX_INIMIGOS */) {
@@ -121,6 +127,25 @@ int main(){
     	        al_draw_filled_rectangle(jogador2->x - jogador2->lado / 2, jogador2->y - jogador2->lado / 2, jogador2->x + jogador2->lado / 2, jogador2->y + jogador2->lado / 2, al_map_rgb(0, 0, 255));
         	    desenhaInimigos(inimigos);
             	balasInimigos(inimigos);
+
+
+				/*Desenha jogador1*/
+				if(jogador1->face == DIRECAO_ESQUERDA) al_draw_bitmap(jogadorEsquerda, jogador1->x - 24, jogador1->y - 24, 0);
+				if(jogador1->face == DIRECAO_DIREITA) al_draw_bitmap(jogadorDireita, jogador1->x - 24, jogador1->y - 24, 0);
+				if(jogador1->face == DIRECAO_CIMA) al_draw_bitmap(jogadorCima, jogador1->x - 24, jogador1->y - 24, 0);
+				if(jogador1->face == DIRECAO_BAIXO) al_draw_bitmap(jogadorBaixo, jogador1->x - 24, jogador1->y - 24, 0);
+
+				/*Desenha jogador2*/
+				if(jogador2->face == DIRECAO_ESQUERDA) al_draw_bitmap(jogadorEsquerda, jogador2->x - 24, jogador2->y - 24, 0);
+				if(jogador2->face == DIRECAO_DIREITA) al_draw_bitmap(jogadorDireita, jogador2->x - 24, jogador2->y - 24, 0);
+				if(jogador2->face == DIRECAO_CIMA) al_draw_bitmap(jogadorCima, jogador2->x - 24, jogador2->y - 24, 0);
+				if(jogador2->face == DIRECAO_BAIXO) al_draw_bitmap(jogadorBaixo, jogador2->x - 24, jogador2->y - 24, 0);
+ 
+				/*Desenha inimigos*/
+				
+
+
+				
             
             	for (bala *id = jogador1->arma->tiros; id != NULL; id = (bala*) id->prox) {
                 	al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(255, 0, 0));
@@ -148,4 +173,18 @@ int main(){
 	        else if (event.type == 42) break;
 		}
 	}
+
+	al_destroy_bitmap(jogadorBaixo);
+	al_destroy_bitmap(jogadorCima);
+	al_destroy_bitmap(jogadorDireita);
+	al_destroy_bitmap(jogadorEsquerda);
+	
+	
+	al_destroy_font(fontTTF);
+	al_destroy_display(disp);
+	al_destroy_timer(timer);
+	al_destroy_event_queue(queue);
+	destroiJogador(jogador1);
+	destroiJogador(jogador2);
+	return 0;
 }

@@ -83,7 +83,19 @@ void atualizaBalas(jogador *jogador){
 				id = jogador->arma->tiros;
 			}
 		}
-		else{
+		else if((id->y < 0) || (id->y > Y_TELA)){
+			if (anterior){
+				anterior->prox = id->prox;
+				destroiBala(id);
+				id = (bala*) anterior->prox;
+			}
+			else {
+				jogador->arma->tiros = (bala*) id->prox;
+				destroiBala(id);
+				id = jogador->arma->tiros;
+			}
+		}
+		else {
 			anterior = id;
 			id = (bala*) id->prox;
 		}

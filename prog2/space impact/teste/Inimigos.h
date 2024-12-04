@@ -8,7 +8,7 @@
 
 
 #define MAX_INIMIGOS 10
-#define VELOCIDADE_INIMIGO 2
+#define VELOCIDADE_INIMIGO 7
 
 typedef struct inimigo {
     unsigned short x;
@@ -23,8 +23,8 @@ typedef struct inimigo {
 
 void defineCorInimigo(inimigo *id);
 inimigo* criaInimigo(int tipo, int x, int y);
-void destroiInimigoEspecifico(inimigo **lista, inimigo *alvo);
 void adicionaInimigo(inimigo **lista, int tipo, float x, float y);
+void destroiInimigo(inimigo *elemento);
 void inimigoAtira(inimigo *elemento);
 void balasInimigos(inimigo *inimigos);
 unsigned char colisaoInimigoJogador(inimigo *inimigo, jogador *jogador);

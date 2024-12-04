@@ -47,7 +47,7 @@ void adicionaInimigo(inimigo **lista, int tipo, float x, float y) {
     *lista = novo;
 }
 
-void destroiInimigo(inimigo *elemento){
+void destroiInimigo(inimigo *elemento) {
 
 	free(elemento);
 }
@@ -93,44 +93,45 @@ void atualizaInimigos(inimigo **lista, jogador *jogador) {
             case 0: /* Cometa */
                 int dx = jogador->x - atual->x;
                 int dy = jogador->y - atual->y;
-
+                
                 float variacao = (rand() % 20 - 10) / 100.0; /* Variação entre -0.1 e 0.1 */
-
+                
                 if (abs(dx) > abs(dy)) {
                     if (dx > 0) {
-                        atual->x += VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->x += (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
                         if (colisaoInimigoJogador(atual, jogador)) {
                             jogador->vida -= 1;
                         }
                     } else {
-                        atual->x -= VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->x -= (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
                     }
                 } else {
                     if (dy > 0) {
-                        atual->y += VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->y += (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
                     } else {
-                        atual->y -= VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->y -= (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
                     }
                 }
                 break;
 
             case 1: /* Scout */
-                atual->x -= (atual->tipo * VELOCIDADE_INIMIGO);
+                atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
                 break;
             case 2: /* Soldier */
-                atual->x -= (atual->tipo * VELOCIDADE_INIMIGO);
+                atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
                 break;
             case 3: /* Heavy */
-                atual->x -= (atual->tipo * VELOCIDADE_INIMIGO);
-
-                int chanceDeAtirar = (atual->tipo == 1) ? 15 : (atual->tipo == 2) ? 25 : 30;
-                if (rand() % 100 < chanceDeAtirar) {
-                    inimigoAtira(atual);
-                }
+                atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
                 break;
 
             default:
                 break;
+        }
+
+        int chanceDeAtirar = (atual->tipo == 2) ? 1.5 : (atual->tipo == 3) ? 2.5 : 3.0;
+        if (rand() % 100 < chanceDeAtirar && atual->tipo != 0) {
+            inimigoAtira(atual);
+            atual->arma->tempo = REGARGA_PISTOLA;
         }
 
         if (colisaoInimigoJogador(atual, jogador)) {
@@ -162,9 +163,25 @@ void atualizaInimigos(inimigo **lista, jogador *jogador) {
 
 
 void desenhaInimigos(inimigo *lista) {
+
+    ALLEGRO_BITMAP *missel = al_load_bitmap("acessorios/missel.png");
+    ALLEGRO_BITMAP *inimigoScout = al_load_bitmap("acessorios/inimigo_scout.png");
+    ALLEGRO_BITMAP *inimigoSoldier = al_load_bitmap("acessorios/inimigo_soldier.png");
+    ALLEGRO_BITMAP *inimigoHeavy = al_load_bitmap("acessorios/inimigo_heavy.png");
+    
+
     for (inimigo *id = lista; id != NULL; id = id->prox) {
-        al_draw_filled_rectangle(id->x-id->lado/2, id->y-id->lado/2, id->x+id->lado/2, id->y+id->lado/2, id->cor);
+        //al_draw_filled_rectangle(id->x-id->lado/2, id->y-id->lado/2, id->x+id->lado/2, id->y+id->lado/2, id->cor);
+        if (id->tipo == 0)al_draw_bitmap(missel, id->x - 8, id->y - 5, 0);
+        if (id->tipo == 1)al_draw_bitmap(inimigoScout, id->x - 32, id->y - 32, 0);
+        if (id->tipo == 2)al_draw_bitmap(inimigoSoldier, id->x - 32, id->y - 32, 0);
+        if (id->tipo == 3)al_draw_bitmap(inimigoHeavy, id->x - 32, id->y - 32, 0);
     }
+
+    al_destroy_bitmap(missel);
+    al_destroy_bitmap(inimigoScout);
+    al_destroy_bitmap(inimigoSoldier);
+    al_destroy_bitmap(inimigoHeavy);
 }
 
 void destroiInimigos(inimigo *lista) {
