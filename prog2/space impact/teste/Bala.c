@@ -29,6 +29,22 @@ void moveBalas(bala *balas) {
             case DIRECAO_BAIXO:
                 id->y += MOVI_BALA;
                 break;
+            case DIRECAO_ESQUERDA_CIMA:
+                id->x -= MOVI_BALA;
+                id->y -= MOVI_BALA;
+                break;
+            case DIRECAO_DIREITA_CIMA:
+                id->x += MOVI_BALA;
+                id->y -= MOVI_BALA;
+                break;
+            case DIRECAO_ESQUERDA_BAIXO:
+                id->x -= MOVI_BALA;
+                id->y += MOVI_BALA;
+                break;
+            case DIRECAO_DIREITA_BAIXO:
+                id->x += MOVI_BALA;
+                id->y += MOVI_BALA;
+                break;
             default:
                 break;
         }

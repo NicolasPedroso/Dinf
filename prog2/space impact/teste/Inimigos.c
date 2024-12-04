@@ -28,7 +28,7 @@ inimigo* criaInimigo(int tipo, int x, int y) {
 
     novoInimigo->x = x;
     novoInimigo->y = y;
-    novoInimigo->vida = 5*tipo;
+    novoInimigo->vida = 5 + 5*tipo;
     novoInimigo->lado = 7 + 7*tipo;
     novoInimigo->tipo = tipo;
     novoInimigo->prox = NULL;
@@ -45,6 +45,11 @@ void adicionaInimigo(inimigo **lista, int tipo, float x, float y) {
 
     novo->prox = *lista;
     *lista = novo;
+}
+
+void destroiInimigo(inimigo *elemento){
+
+	free(elemento);
 }
 
 void inimigoAtira(inimigo *elemento){
@@ -71,86 +76,90 @@ void balasInimigos(inimigo *inimigos) {
 }
 
 unsigned char colisaoInimigoJogador(inimigo *inimigo, jogador *jogador) {
-    if (
-        (
-            ((jogador->y - jogador->lado / 2 >= inimigo->y - inimigo->lado / 2) &&
-             (inimigo->y + inimigo->lado / 2 >= jogador->y - jogador->lado / 2)) ||
-            ((inimigo->y - inimigo->lado / 2 >= jogador->y - jogador->lado / 2) &&
-             (jogador->y + jogador->lado / 2 >= inimigo->y - inimigo->lado / 2))
-        ) &&
-        (
-            ((jogador->x - jogador->lado / 2 >= inimigo->x - inimigo->lado / 2) &&
-             (inimigo->x + inimigo->lado / 2 >= jogador->x - jogador->lado / 2)) ||
-            ((inimigo->x - inimigo->lado / 2 >= jogador->x - jogador->lado / 2) &&
-             (jogador->x + jogador->lado / 2 >= inimigo->x - inimigo->lado / 2))
-        )
-    ) {
-        return 1; /*Ha colisao*/
-    } else {
-        return 0; /*Nao ha colisao*/
-    }
+    
+    if ((((jogador->y-jogador->lado/2 >= inimigo->y-inimigo->lado/2) && (inimigo->y+inimigo->lado/2 >= jogador->y-jogador->lado/2)) ||
+		((inimigo->y-inimigo->lado/2 >= jogador->y-jogador->lado/2) && (jogador->y+jogador->lado/2 >= inimigo->y-inimigo->lado/2))) &&
+		(((jogador->x-jogador->lado/2 >= inimigo->x-inimigo->lado/2) && (inimigo->x+inimigo->lado/2 >= jogador->x-jogador->lado/2)) ||
+		((inimigo->x-inimigo->lado/2 >= jogador->x-jogador->lado/2) && (jogador->x+jogador->lado/2 >= inimigo->x-inimigo->lado/2)))) return 1;
+	else return 0;
 }
 
-void atualizaInimigos(inimigo *lista, jogador *jogador1) {
-    for (inimigo *id = lista; id != NULL; id = id->prox) {
-        switch (id->tipo) {
+void atualizaInimigos(inimigo **lista, jogador *jogador) {
+    inimigo *anterior = NULL;
+    inimigo *atual = *lista;
+
+    while (atual != NULL) {
+        switch (atual->tipo) {
             case 0: /* Cometa */
+                int dx = jogador->x - atual->x;
+                int dy = jogador->y - atual->y;
 
-                int dx = jogador1->x - id->x;
-                int dy = jogador1->y - id->y;
-
-                float variacao = (rand() % 20 - 10) / 100.0; /*Variacao entre -0.1 e 0.1*/
+                float variacao = (rand() % 20 - 10) / 100.0; /* Variação entre -0.1 e 0.1 */
 
                 if (abs(dx) > abs(dy)) {
                     if (dx > 0) {
-                        id->x += VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->x += VELOCIDADE_INIMIGO * (1 + variacao);
+                        if (colisaoInimigoJogador(atual, jogador)) {
+                            jogador->vida -= 1;
+                        }
                     } else {
-                        id->x -= VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->x -= VELOCIDADE_INIMIGO * (1 + variacao);
                     }
                 } else {
                     if (dy > 0) {
-                        id->y += VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->y += VELOCIDADE_INIMIGO * (1 + variacao);
                     } else {
-                        id->y -= VELOCIDADE_INIMIGO * (1 + variacao);
+                        atual->y -= VELOCIDADE_INIMIGO * (1 + variacao);
                     }
                 }
-            break;
+                break;
 
-            case 1: /*Scout*/
-                id->x -= (2*VELOCIDADE_INIMIGO);
+            case 1: /* Scout */
+                atual->x -= (atual->tipo * VELOCIDADE_INIMIGO);
+                break;
+            case 2: /* Soldier */
+                atual->x -= (atual->tipo * VELOCIDADE_INIMIGO);
+                break;
+            case 3: /* Heavy */
+                atual->x -= (atual->tipo * VELOCIDADE_INIMIGO);
 
-                if (rand() % 100 < 15) { 
-                    inimigoAtira(id);
+                int chanceDeAtirar = (atual->tipo == 1) ? 15 : (atual->tipo == 2) ? 25 : 30;
+                if (rand() % 100 < chanceDeAtirar) {
+                    inimigoAtira(atual);
                 }
-            break;
-
-            case 2: /*Soldier*/
-                id->x -= (2*VELOCIDADE_INIMIGO);
-
-                // Lógica de tiro (atirar com base em um tempo ou frequência)
-                if (rand() % 100 < 25) { // Chance de 5% de atirar a cada atualização
-                    inimigoAtira(id);
-                }
-            break;
-
-            case 3: /*Heavy*/
-                id->x -= (2*VELOCIDADE_INIMIGO);
-
-                if (rand() % 100 < 30) {
-                    inimigoAtira(id);
-                }
-            break;
+                break;
 
             default:
                 break;
         }
+
+        if (colisaoInimigoJogador(atual, jogador)) {
+            jogador->vida -= 1;
+            atual->vida = 0;
+        }
         
-        if (colisaoInimigoJogador(id, jogador1)) {
-            jogador1->vida -= 10; // Reduz a vida do jogador ao colidir
-            id->vida = 0;        // Marca o inimigo como destruído
+        if (atual->x - atual->lado / 2 < 0 && atual->tipo != 0) {
+            atual->vida = 0;
+        }
+
+        if (atual->vida <= 0) {
+            inimigo *temp = atual;
+            if (anterior) {
+                anterior->prox = atual->prox;
+            } else {
+                *lista = atual->prox;  // Atualiza a cabeça da lista
+            }
+            destroiPistola(temp->arma);
+            free(temp);
+            atual = (anterior) ? anterior->prox : *lista;
+        } else {
+            anterior = atual;
+            atual = atual->prox;
         }
     }
 }
+
+
 
 void desenhaInimigos(inimigo *lista) {
     for (inimigo *id = lista; id != NULL; id = id->prox) {

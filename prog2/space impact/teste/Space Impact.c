@@ -6,10 +6,6 @@
 #include "Jogador.h"
 #include "Inimigos.h"
 
-#define X_TELA 800
-#define Y_TELA 400
-#define NUM_INIMIGOS 50
-
 int main(){
 	
 	inimigo *inimigos = NULL;
@@ -76,66 +72,80 @@ int main(){
 	al_start_timer(timer);
 	al_start_timer(timer_inimigos);
 	unsigned char p1k = 0, p2k = 0;
-	while(1){
-		al_wait_for_event(queue, &event);
-		
-		if (p1k || p2k){
-			al_clear_to_color(al_map_rgb(0, 0, 0));
-			if (p2k && p1k) al_draw_text(fontTTF, al_map_rgb(255, 255, 255), X_TELA/2 - 40, Y_TELA/2-15, 0, "EMPATE!");
-			else if (p2k) al_draw_text(fontTTF, al_map_rgb(255, 0, 0), X_TELA/2 - 75, Y_TELA/2-15, 0, "JOGADOR 1 GANHOU!");
-			else if (p1k) al_draw_text(fontTTF, al_map_rgb(0, 0, 255), X_TELA/2 - 75, Y_TELA/2-15, 0, "JOGADOR 2 GANHOU!");
-			al_draw_text(fontTTF, al_map_rgb(255, 255, 255), X_TELA/2 - 110, Y_TELA/2+5, 0, "PRESSIONE ESPACO PARA SAIR");
-			al_flip_display();
-
-			if ((event.type == 10) && (event.keyboard.keycode == 75)) break;
-			else if (event.type == 42) break;
-		}
-		else{
-			if (event.type == 30){
-				atualizaPosicao(jogador1, jogador2);
-				if (inimigos_ativos < NUM_INIMIGOS) {
-                    int tipo = rand() % 4; // Escolha aleatória de tipo de inimigo
-                	float x = X_TELA;
+	unsigned char vivo = 0;
+	
+	while (1) {
+    	al_wait_for_event(queue, &event);
+    
+    	if (vivo) {
+        	al_clear_to_color(al_map_rgb(0, 0, 0));
+        	al_draw_text(fontTTF, al_map_rgb(12, 238, 26), X_TELA / 2 - 75, Y_TELA / 2 - 15, 0, "MORREU PROS MOBS RUIM!");
+       	 al_draw_text(fontTTF, al_map_rgb(12, 238, 26), X_TELA / 2 - 110, Y_TELA / 2 + 5, 0, "PRESSIONE ESPACO PARA SAIR");
+        	al_flip_display();
+        
+			if (event.type == 10 && event.keyboard.keycode == ALLEGRO_KEY_R) vivo = 0;
+        	if ((event.type == 10 && event.keyboard.keycode == 75) || (event.type == 42)) break;
+    	}
+    	else if (p1k || p2k) {
+        	al_clear_to_color(al_map_rgb(0, 0, 0));
+        	if (p2k && p1k) {
+            	al_draw_text(fontTTF, al_map_rgb(255, 255, 255), X_TELA / 2 - 40, Y_TELA / 2 - 15, 0, "EMPATE!");
+        	} else if (p2k) {
+            	al_draw_text(fontTTF, al_map_rgb(255, 0, 0), X_TELA / 2 - 75, Y_TELA / 2 - 15, 0, "JOGADOR 1 GANHOU!");
+        	} else if (p1k) {
+            	al_draw_text(fontTTF, al_map_rgb(0, 0, 255), X_TELA / 2 - 75, Y_TELA / 2 - 15, 0, "JOGADOR 2 GANHOU!");
+        	}
+        	al_draw_text(fontTTF, al_map_rgb(255, 255, 255), X_TELA / 2 - 110, Y_TELA / 2 + 5, 0, "PRESSIONE ESPACO PARA SAIR");
+        	al_flip_display();
+        
+        	if ((event.type == 10 && event.keyboard.keycode == 75) || (event.type == 42)) break;
+    	}
+    	else {
+        	if (event.type == 30) {
+            	al_clear_to_color(al_map_rgb(0, 0, 0)); // Limpando a tela apenas uma vez por iteração
+	            atualizaPosicao(jogador1, jogador2);
+    	        if (inimigos_ativos < 500 /* MAX_INIMIGOS */) {
+        	        int tipo = rand() % 4; // Escolha aleatória de tipo de inimigo
+            	    float x = X_TELA;
                 	float y = rand() % Y_TELA; // Posição aleatória na tela
-                	adicionaInimigo(&inimigos, tipo, x, y);
-                	inimigos_ativos++;
-                }
-				atualizaInimigos(inimigos, jogador1);
-				p1k = veMortePVP(jogador2, jogador1);
-				p2k = veMortePVP(jogador1, jogador2);
-				al_clear_to_color(al_map_rgb(0, 0, 0));
-				al_draw_filled_rectangle(jogador1->x-jogador1->lado/2, jogador1->y-jogador1->lado/2, jogador1->x+jogador1->lado/2, jogador1->y+jogador1->lado/2, al_map_rgb(255, 0, 0));
-				al_draw_filled_rectangle(jogador2->x-jogador2->lado/2, jogador2->y-jogador2->lado/2, jogador2->x+jogador2->lado/2, jogador2->y+jogador2->lado/2, al_map_rgb(0, 0, 255));
-	    		desenhaInimigos(inimigos);
-				balasInimigos(inimigos);
-				for (bala *id = jogador1->arma->tiros; id != NULL; id = (bala*) id->prox) al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(255, 0, 0));
-	    		if (jogador1->arma->tempo) jogador1->arma->tempo--;
-	    		for (bala *id = jogador2->arma->tiros; id != NULL; id = (bala*) id->prox) al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(0, 0, 255));
-	    		if (jogador2->arma->tempo) jogador2->arma->tempo--;
-	    		al_flip_display();
-			}
-			else if ((event.type == 10) || (event.type == 12)){
-				if (event.keyboard.keycode == 1) controleEsquerda(jogador1->controle);
-				else if (event.keyboard.keycode == 4) controleDireita(jogador1->controle);
-				else if (event.keyboard.keycode == 23) controleCima(jogador1->controle);
-				else if (event.keyboard.keycode == 19) controleBaixo(jogador1->controle);
-				else if (event.keyboard.keycode == 82) controleEsquerda(jogador2->controle);
-				else if (event.keyboard.keycode == 83) controleDireita(jogador2->controle);
-				else if (event.keyboard.keycode == 84) controleCima(jogador2->controle);
-				else if (event.keyboard.keycode == 85) controleBaixo(jogador2->controle);
-				else if (event.keyboard.keycode == 3) controleAtira(jogador1->controle);
-				else if (event.keyboard.keycode == 216) controleAtira(jogador2->controle);
-			}																																			
-			else if (event.type == 42) break;
+	                adicionaInimigo(&inimigos, tipo, x, y);
+    	            inimigos_ativos++;
+        	    }
+            	atualizaInimigos(&inimigos, jogador1);
+	            p1k = veMortePVP(jogador2, jogador1);
+    	        p2k = veMortePVP(jogador1, jogador2);
+        	    vivo = veMortePVE(jogador1);
+            
+            	// Desenho de elementos
+	            al_draw_filled_rectangle(jogador1->x - jogador1->lado / 2, jogador1->y - jogador1->lado / 2, jogador1->x + jogador1->lado / 2, jogador1->y + jogador1->lado / 2, al_map_rgb(255, 0, 0));
+    	        al_draw_filled_rectangle(jogador2->x - jogador2->lado / 2, jogador2->y - jogador2->lado / 2, jogador2->x + jogador2->lado / 2, jogador2->y + jogador2->lado / 2, al_map_rgb(0, 0, 255));
+        	    desenhaInimigos(inimigos);
+            	balasInimigos(inimigos);
+            
+            	for (bala *id = jogador1->arma->tiros; id != NULL; id = (bala*) id->prox) {
+                	al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(255, 0, 0));
+            	}
+	            if (jogador1->arma->tempo) jogador1->arma->tempo--;
+    	        for (bala *id = jogador2->arma->tiros; id != NULL; id = (bala*) id->prox) {
+        	        al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(0, 0, 255));
+            	}
+	            if (jogador2->arma->tempo) jogador2->arma->tempo--;
+	
+    	        al_flip_display();
+        	}
+        		else if ((event.type == 10) || (event.type == 12)) {
+            		if (event.keyboard.keycode == 1) controleEsquerda(jogador1->controle);
+	            	else if (event.keyboard.keycode == 4) controleDireita(jogador1->controle);
+    	        	else if (event.keyboard.keycode == 23) controleCima(jogador1->controle);
+	    	        else if (event.keyboard.keycode == 19) controleBaixo(jogador1->controle);
+    	    	    else if (event.keyboard.keycode == 82) controleEsquerda(jogador2->controle);
+        	    	else if (event.keyboard.keycode == 83) controleDireita(jogador2->controle);
+	            	else if (event.keyboard.keycode == 84) controleCima(jogador2->controle);
+		            else if (event.keyboard.keycode == 85) controleBaixo(jogador2->controle);
+    		        else if (event.keyboard.keycode == 3) controleAtira(jogador1->controle);
+        		    else if (event.keyboard.keycode == 216) controleAtira(jogador2->controle);
+       			}
+	        else if (event.type == 42) break;
 		}
 	}
-
-	al_destroy_font(fontTTF);
-	al_destroy_display(disp);
-	al_destroy_timer(timer);
-	al_destroy_event_queue(queue);
-	destroiJogador(jogador1);
-	destroiJogador(jogador2);
-
-	return 0;
 }

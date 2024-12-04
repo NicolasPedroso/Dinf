@@ -1,9 +1,6 @@
 #include <stdlib.h>
 #include "Jogador.h"
 
-#define X_TELA 800
-#define Y_TELA 400
-
 jogador* criaJogador(unsigned char lado, unsigned char face, unsigned short x, unsigned short y, unsigned short max_x, unsigned short max_y){
 
 	if ((x - lado/2 < 0) || (x + lado/2 > max_x) || (y - lado/2 < 0) || (y + lado/2 > max_y)) return NULL;
@@ -66,6 +63,34 @@ void jogadorAtira(jogador *elemento, unsigned char trajetoria){
 	if (tiro) elemento->arma->tiros = tiro;
 }
 
+void atualizaBalas(jogador *jogador){
+	
+	bala *anterior = NULL;
+	for (bala *id = jogador->arma->tiros; id != NULL;){
+		if (!id->trajetoria) id->x -= MOVI_BALA;
+		else if (id->trajetoria == 1) id->x += MOVI_BALA;
+	
+		
+		if ((id->x < 0) || (id->x > X_TELA)){
+			if (anterior){
+				anterior->prox = id->prox;
+				destroiBala(id);
+				id = (bala*) anterior->prox;
+			}
+			else {
+				jogador->arma->tiros = (bala*) id->prox;
+				destroiBala(id);
+				id = jogador->arma->tiros;
+			}
+		}
+		else{
+			anterior = id;
+			id = (bala*) id->prox;
+		}
+	}
+}
+
+
 void atualizaPosicao(jogador *jogador1, jogador *jogador2){
 
 	if (jogador1->controle->esquerda){
@@ -126,33 +151,6 @@ void atualizaPosicao(jogador *jogador1, jogador *jogador2){
 	moveBalas(jogador2->arma->tiros);
 }
 
-void atualizaBalas(jogador *jogador){
-	
-	bala *anterior = NULL;
-	for (bala *id = jogador->arma->tiros; id != NULL;){
-		if (!id->trajetoria) id->x -= MOVI_BALA;
-		else if (id->trajetoria == 1) id->x += MOVI_BALA;
-	
-		
-		if ((id->x < 0) || (id->x > X_TELA)){
-			if (anterior){
-				anterior->prox = id->prox;
-				destroiBala(id);
-				id = (bala*) anterior->prox;
-			}
-			else {
-				jogador->arma->tiros = (bala*) id->prox;
-				destroiBala(id);
-				id = jogador->arma->tiros;
-			}
-		}
-		else{
-			anterior = id;
-			id = (bala*) id->prox;
-		}
-	}
-}
-
 unsigned char veMortePVP(jogador *assassino, jogador *vitima){
 
 	bala *anterior = NULL;
@@ -178,6 +176,12 @@ unsigned char veMortePVP(jogador *assassino, jogador *vitima){
 		anterior = id;
 	}
 	return 0;
+}
+
+unsigned char veMortePVE(jogador *jogador){
+	
+	if (jogador->vida < 1) return 1;
+	else return 0;
 }
 
 void destroiJogador(jogador *elemento){

@@ -23,6 +23,7 @@ void jogadorAtira(jogador *elemento, unsigned char trajetoria);
 void atualizaPosicao(jogador *jogador1, jogador *jogador2);
 void atualizaBalas(jogador *jogador);
 unsigned char veMortePVP(jogador *assassino, jogador *vitima);
+unsigned char veMortePVE(jogador *jogador);
 void destroiJogador(jogador *elemento);
 
 #endif

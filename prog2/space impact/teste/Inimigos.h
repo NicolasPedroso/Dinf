@@ -28,7 +28,8 @@ void adicionaInimigo(inimigo **lista, int tipo, float x, float y);
 void inimigoAtira(inimigo *elemento);
 void balasInimigos(inimigo *inimigos);
 unsigned char colisaoInimigoJogador(inimigo *inimigo, jogador *jogador);
-void atualizaInimigos(inimigo *lista, jogador *jogador1);
+void limiteInimigos(inimigo **inimigo);
+void atualizaInimigos(inimigo **lista, jogador *jogador1);
 void desenhaInimigos(inimigo *lista);
 void destroiInimigos(inimigo *lista);
 
