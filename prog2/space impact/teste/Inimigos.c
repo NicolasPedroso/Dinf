@@ -28,7 +28,7 @@ inimigo* criaInimigo(int tipo, int x, int y) {
 
     novoInimigo->x = x;
     novoInimigo->y = y;
-    novoInimigo->vida = 5 + 5*tipo;
+    novoInimigo->vida = 1 + 1*tipo;
     novoInimigo->lado = 7 + 7*tipo;
     novoInimigo->tipo = tipo;
     novoInimigo->prox = NULL;
@@ -75,6 +75,59 @@ void balasInimigos(inimigo *inimigos) {
     }
 }
 
+unsigned char veBalasJogador(jogador *assassino, inimigo *vitima) {
+    bala *anterior = NULL;
+    for (bala *id = assassino->arma->tiros; id != NULL; id = (bala*) id->prox) {
+        if ((id->x >= vitima->x - vitima->lado/2) && (id->x <= vitima->x + vitima->lado/2) &&
+            (id->y >= vitima->y - vitima->lado/2) && (id->y <= vitima->y + vitima->lado/2)) {
+            vitima->vida--;
+            assassino->pontos += 100;
+            if (vitima->vida <= 0) {
+                return 1;
+            }
+            
+            if (anterior) {
+                anterior->prox = id->prox;
+                destroiBala(id);
+                id = (bala*) anterior->prox;
+            } else {
+                assassino->arma->tiros = (bala*) id->prox;
+                destroiBala(id);
+                id = assassino->arma->tiros;
+            }
+            return 0;
+        }
+        anterior = id;
+    }
+    return 0;
+}
+
+unsigned char veBalasInimigo(inimigo *assassino, jogador *vitima) {
+    bala *anterior = NULL;
+    for (bala *id = assassino->arma->tiros; id != NULL; id = (bala*) id->prox) {
+        if ((id->x >= vitima->x - vitima->lado/2) && (id->x <= vitima->x + vitima->lado/2) &&
+            (id->y >= vitima->y - vitima->lado/2) && (id->y <= vitima->y + vitima->lado/2)) {
+            vitima->vida--;
+            if (vitima->vida <= 0) {
+                return 1;
+            }
+            
+            if (anterior) {
+                anterior->prox = id->prox;
+                destroiBala(id);
+                id = (bala*) anterior->prox;
+            } else {
+                assassino->arma->tiros = (bala*) id->prox;
+                destroiBala(id);
+                id = assassino->arma->tiros;
+            }
+            return 0;
+        }
+        anterior = id;
+    }
+    return 0;
+}
+
 unsigned char colisaoInimigoJogador(inimigo *inimigo, jogador *jogador) {
     
     if ((((jogador->y-jogador->lado/2 >= inimigo->y-inimigo->lado/2) && (inimigo->y+inimigo->lado/2 >= jogador->y-jogador->lado/2)) ||
@@ -83,6 +136,7 @@ unsigned char colisaoInimigoJogador(inimigo *inimigo, jogador *jogador) {
 		((inimigo->x-inimigo->lado/2 >= jogador->x-jogador->lado/2) && (jogador->x+jogador->lado/2 >= inimigo->x-inimigo->lado/2)))) return 1;
 	else return 0;
 }
+
 
 void atualizaInimigos(inimigo **lista, jogador *jogador) {
     inimigo *anterior = NULL;
@@ -98,24 +152,24 @@ void atualizaInimigos(inimigo **lista, jogador *jogador) {
                 
                 if (abs(dx) > abs(dy)) {
                     if (dx > 0) {
-                        atual->x += (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
+                        atual->x += (VELOCIDADE_INIMIGO - atual->tipo - 1) * (1 + variacao);
                         if (colisaoInimigoJogador(atual, jogador)) {
                             jogador->vida -= 1;
                         }
                     } else {
-                        atual->x -= (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
+                        atual->x -= (VELOCIDADE_INIMIGO - atual->tipo - 1) * (1 + variacao);
                     }
                 } else {
                     if (dy > 0) {
-                        atual->y += (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
+                        atual->y += (VELOCIDADE_INIMIGO - atual->tipo - 1) * (1 + variacao);
                     } else {
-                        atual->y -= (VELOCIDADE_INIMIGO -atual->tipo) * (1 + variacao);
+                        atual->y -= (VELOCIDADE_INIMIGO - atual->tipo - 1) * (1 + variacao);
                     }
                 }
                 break;
 
             case 1: /* Scout */
-                atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
+                //atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
                 break;
             case 2: /* Soldier */
                 atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
@@ -138,6 +192,10 @@ void atualizaInimigos(inimigo **lista, jogador *jogador) {
             jogador->vida -= 1;
             atual->vida = 0;
         }
+        veBalasJogador(jogador, atual);
+
+        veBalasInimigo(atual, jogador);
+
         
         if (atual->x - atual->lado / 2 < 0 && atual->tipo != 0) {
             atual->vida = 0;
@@ -148,7 +206,7 @@ void atualizaInimigos(inimigo **lista, jogador *jogador) {
             if (anterior) {
                 anterior->prox = atual->prox;
             } else {
-                *lista = atual->prox;  // Atualiza a cabeça da lista
+                *lista = atual->prox;  /*Atualiza a cabeca da lista*/
             }
             destroiPistola(temp->arma);
             free(temp);
@@ -171,11 +229,11 @@ void desenhaInimigos(inimigo *lista) {
     
 
     for (inimigo *id = lista; id != NULL; id = id->prox) {
-        //al_draw_filled_rectangle(id->x-id->lado/2, id->y-id->lado/2, id->x+id->lado/2, id->y+id->lado/2, id->cor);
-        if (id->tipo == 0)al_draw_bitmap(missel, id->x - 8, id->y - 5, 0);
-        if (id->tipo == 1)al_draw_bitmap(inimigoScout, id->x - 32, id->y - 32, 0);
+        al_draw_filled_rectangle(id->x-id->lado/2, id->y-id->lado/2, id->x+id->lado/2, id->y+id->lado/2, id->cor);
+        if (id->tipo == 0)al_draw_bitmap(missel, id->x - 5, id->y - 5, 0);
+        if (id->tipo == 1)al_draw_bitmap(inimigoScout, id->x - 33, id->y - 32, 0);
         if (id->tipo == 2)al_draw_bitmap(inimigoSoldier, id->x - 32, id->y - 32, 0);
-        if (id->tipo == 3)al_draw_bitmap(inimigoHeavy, id->x - 32, id->y - 32, 0);
+        if (id->tipo == 3)al_draw_bitmap(inimigoHeavy, id->x - 28, id->y - 32, 0);
     }
 
     al_destroy_bitmap(missel);

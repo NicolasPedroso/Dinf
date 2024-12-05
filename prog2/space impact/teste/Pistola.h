@@ -4,7 +4,7 @@
 #include "Bala.h"
 
 #define REGARGA_ESCOPETA 10
-#define REGARGA_PISTOLA 7
+#define REGARGA_PISTOLA 1
 #define REGARGA_METRALHADORA 5
 
 

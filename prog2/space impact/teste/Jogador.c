@@ -8,6 +8,7 @@ jogador* criaJogador(unsigned char lado, unsigned char face, unsigned short x, u
 
 	jogador *novoJogador = (jogador*) malloc(sizeof(jogador));
 	if (!novoJogador) return NULL;
+	novoJogador->pontos = 0;
 	novoJogador->lado = lado;
 	novoJogador->face = face;
 	novoJogador->vida = 5;

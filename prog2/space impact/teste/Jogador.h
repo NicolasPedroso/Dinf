@@ -7,6 +7,7 @@
 #define VELOCIDADE_JOGADOR 7	
 
 typedef struct {
+	unsigned short pontos;
 	unsigned char lado;
 	unsigned char face;
 	unsigned char vida;

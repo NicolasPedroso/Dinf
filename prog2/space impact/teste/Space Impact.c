@@ -9,10 +9,13 @@
 #include "Jogador.h"
 #include "Inimigos.h"
 
+#define VELOCIDADE_DESLIZAMENTO 2
+
 int main(){
 	
 	inimigo *inimigos = NULL;
-	int inimigos_ativos = 0;
+	int regargaOnda = 0;
+	char pontos[100];
 
 	al_init();
 	al_init_primitives_addon();
@@ -65,6 +68,15 @@ int main(){
 	ALLEGRO_BITMAP *jogadorDireita = al_load_bitmap("acessorios/jogador_direita.png");
 	ALLEGRO_BITMAP *jogadorCima = al_load_bitmap("acessorios/jogador_cima.png");
 	ALLEGRO_BITMAP *jogadorBaixo = al_load_bitmap("acessorios/jogador_baixo.png");
+	ALLEGRO_BITMAP *fundo1 = al_load_bitmap("acessorios/fase_1.png");
+	if (!fundo1) {
+        fprintf(stderr, "Erro ao carregar imagem de fundo1!\n");
+        al_destroy_display(disp);
+        return -1;
+    }
+	int larguraFundo = al_get_bitmap_width(fundo1);
+	float posicaoFundo = 0;
+
 
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_display_event_source(disp));
@@ -83,6 +95,10 @@ int main(){
 	while (1) {
     	al_wait_for_event(queue, &event);
     
+		posicaoFundo -= VELOCIDADE_DESLIZAMENTO;
+
+		if (posicaoFundo <=  -larguraFundo) { posicaoFundo = 0; }
+
     	if (vivo) {
         	al_clear_to_color(al_map_rgb(0, 0, 0));
         	al_draw_text(fontTTF, al_map_rgb(12, 238, 26), X_TELA / 2 - 75, Y_TELA / 2 - 15, 0, "MORREU PROS MOBS RUIM!");
@@ -108,16 +124,23 @@ int main(){
     	}
     	else {
 			if (event.type == 30) {
-            	al_clear_to_color(al_map_rgb(0, 0, 0)); // Limpando a tela apenas uma vez por iteração
-	            atualizaPosicao(jogador1, jogador2);
-    	        if (inimigos_ativos < 500 /* MAX_INIMIGOS */) {
-        	        int tipo = rand() % 4; // Escolha aleatória de tipo de inimigo
-            	    float x = X_TELA;
-                	float y = rand() % Y_TELA; // Posição aleatória na tela
-	                adicionaInimigo(&inimigos, tipo, x, y);
-    	            inimigos_ativos++;
-        	    }
+            	al_clear_to_color(al_map_rgb(0, 0, 0)); // Limpando a tela apenas uma vez por iteracao
+	            
+				/*Desliza a tela*/
+				al_draw_bitmap(fundo1, posicaoFundo, 0, 0);
+				al_draw_bitmap(fundo1, posicaoFundo + larguraFundo, 0, 0);
+				
+				atualizaPosicao(jogador1, jogador2);
+    	        if(regargaOnda <= 0) {
+					for (int i = 0; i < MAX_INIMIGOS; i++) {
+						adicionaInimigo(&inimigos, 1/*rand() % 4*/, X_TELA/2, rand() % Y_TELA);
+					}
+					regargaOnda += 450;
+				}
+				regargaOnda -= 1;
             	atualizaInimigos(&inimigos, jogador1);
+				sprintf(pontos, "SCORE: %d", jogador1->pontos);
+				al_draw_text(fontTTF, al_map_rgb(12, 238, 26), 10, 10, 0, pontos);
 	            p1k = veMortePVP(jogador2, jogador1);
     	        p2k = veMortePVP(jogador1, jogador2);
         	    vivo = veMortePVE(jogador1);

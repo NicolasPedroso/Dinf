@@ -33,5 +33,4 @@ void atualizaInimigos(inimigo **lista, jogador *jogador1);
 void desenhaInimigos(inimigo *lista);
 void destroiInimigos(inimigo *lista);
 
-
 #endif
