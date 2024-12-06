@@ -6,26 +6,24 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 
+#define RAIO_F 180
 
-#define VELOCIDADE_ROTACAO 0.1
+
+#define VELOCIDADE_INIMIGO 7
 
 typedef struct chefao {
-    unsigned short x;
-	unsigned short y;
-    unsigned char face;
-    unsigned char lado;
-    unsigned char vida;
+    unsigned short tipo, x, y;
+    float angulo, velocidadeRotacao;
+    unsigned char face, lado,  vida;
+    ALLEGRO_BITMAP *sprite;
     pistola *arma;
 } chefao;
 
-
-chefao* criaChefao1(int x, int y, unsigned char face);
-chefao* criaChefao2(int x, int y);
-void chefaoAtira(chefao *elemento);
-void balasChefao(chefao *elemento);
-unsigned char colisaoInimigoJogador(chefao *elemento, jogador *jogador);
-void atualizaChefao(chefao *elemento, jogador *jogador1);
-void desenhaChefao(chefao *elemento);
+chefao* criaChefao(int tipo, int x, int y);
 void destroiChefao(chefao *elemento);
+void chefaoAtira(chefao *elemento, unsigned char trajetoria);
+void atualizaBalasChefao(chefao *elemento);
+unsigned char colisaoChefaoJogador(chefao *chefao, jogador *jogador);
+void atualizaChefao(chefao *chefao, jogador *jogador);
 
 #endif

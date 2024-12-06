@@ -3,7 +3,7 @@
 
 bala* criaBala(unsigned short x, unsigned short y, unsigned char trajetoria, bala *prox){
 
-	if (trajetoria > 3) return NULL;
+	if (trajetoria > 7) return NULL;
 
 	bala *novaBala = (bala*) malloc(sizeof(bala));
 	if (!novaBala) return NULL;

@@ -8,13 +8,14 @@
 
 #include "Jogador.h"
 #include "Inimigos.h"
+#include "Chefao.h"
 
 #define VELOCIDADE_DESLIZAMENTO 2
 
 int main(){
 	
 	inimigo *inimigos = NULL;
-	int regargaOnda = 0;
+	int regargaOnda = 150;
 	char pontos[100];
 
 	al_init();
@@ -87,6 +88,9 @@ int main(){
 	jogador* jogador2 = criaJogador(20, 0, X_TELA-10, Y_TELA/2, X_TELA, Y_TELA);
 	if (!jogador2) return 2;
 
+	chefao* chefao1 = criaChefao(0 , X_TELA - 45, Y_TELA/2);
+	chefao* chefao2 = criaChefao(1 , X_TELA, Y_TELA/2);
+
 	ALLEGRO_EVENT event;
 	al_start_timer(timer);
 	unsigned char p1k = 0, p2k = 0;
@@ -131,24 +135,35 @@ int main(){
 				al_draw_bitmap(fundo1, posicaoFundo + larguraFundo, 0, 0);
 				
 				atualizaPosicao(jogador1, jogador2);
-    	        if(regargaOnda <= 0) {
+				
+				atualizaChefao(chefao1, jogador1);
+				
+				
+				atualizaChefao(chefao2, jogador1);
+
+    	        /*if(regargaOnda <= 0) {
 					for (int i = 0; i < MAX_INIMIGOS; i++) {
-						adicionaInimigo(&inimigos, 1/*rand() % 4*/, X_TELA/2, rand() % Y_TELA);
+						adicionaInimigo(&inimigos, rand() % 4, X_TELA + 50, rand() % Y_TELA);
 					}
 					regargaOnda += 450;
-				}
-				regargaOnda -= 1;
-            	atualizaInimigos(&inimigos, jogador1);
+				}*/
+				//regargaOnda -= 1;
+            	//atualizaInimigos(&inimigos, jogador1);
+				
+				/*Pontos jogador*/
 				sprintf(pontos, "SCORE: %d", jogador1->pontos);
 				al_draw_text(fontTTF, al_map_rgb(12, 238, 26), 10, 10, 0, pontos);
+				
 	            p1k = veMortePVP(jogador2, jogador1);
     	        p2k = veMortePVP(jogador1, jogador2);
         	    vivo = veMortePVE(jogador1);
             
             	// Desenho de elementos
-	            al_draw_filled_rectangle(jogador1->x - jogador1->lado / 2, jogador1->y - jogador1->lado / 2, jogador1->x + jogador1->lado / 2, jogador1->y + jogador1->lado / 2, al_map_rgb(255, 0, 0));
-    	        al_draw_filled_rectangle(jogador2->x - jogador2->lado / 2, jogador2->y - jogador2->lado / 2, jogador2->x + jogador2->lado / 2, jogador2->y + jogador2->lado / 2, al_map_rgb(0, 0, 255));
-        	    desenhaInimigos(inimigos);
+	            //al_draw_filled_rectangle(jogador1->x - jogador1->lado / 2, jogador1->y - jogador1->lado / 2, jogador1->x + jogador1->lado / 2, jogador1->y + jogador1->lado / 2, al_map_rgb(255, 0, 0));
+    	        //al_draw_filled_rectangle(jogador2->x - jogador2->lado / 2, jogador2->y - jogador2->lado / 2, jogador2->x + jogador2->lado / 2, jogador2->y + jogador2->lado / 2, al_map_rgb(0, 0, 255));
+        	    
+				/*Desenha inimigos e seus tiros*/
+				desenhaInimigos(inimigos);
             	balasInimigos(inimigos);
 
 
@@ -164,17 +179,13 @@ int main(){
 				if(jogador2->face == DIRECAO_CIMA) al_draw_bitmap(jogadorCima, jogador2->x - 24, jogador2->y - 24, 0);
 				if(jogador2->face == DIRECAO_BAIXO) al_draw_bitmap(jogadorBaixo, jogador2->x - 24, jogador2->y - 24, 0);
  
-				/*Desenha inimigos*/
-				
-
-
-				
-            
+		   		/*Desenha balas do jogador1*/
             	for (bala *id = jogador1->arma->tiros; id != NULL; id = (bala*) id->prox) {
                 	al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(255, 0, 0));
             	}
 	            if (jogador1->arma->tempo) jogador1->arma->tempo--;
-    	        for (bala *id = jogador2->arma->tiros; id != NULL; id = (bala*) id->prox) {
+    	        /*Desenha balas do jogador2*/
+				for (bala *id = jogador2->arma->tiros; id != NULL; id = (bala*) id->prox) {
         	        al_draw_filled_circle(id->x, id->y, 2, al_map_rgb(0, 0, 255));
             	}
 	            if (jogador2->arma->tempo) jogador2->arma->tempo--;

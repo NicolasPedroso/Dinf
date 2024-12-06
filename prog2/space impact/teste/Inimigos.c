@@ -169,7 +169,7 @@ void atualizaInimigos(inimigo **lista, jogador *jogador) {
                 break;
 
             case 1: /* Scout */
-                //atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
+                atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
                 break;
             case 2: /* Soldier */
                 atual->x -= (VELOCIDADE_INIMIGO -atual->tipo);
@@ -229,7 +229,7 @@ void desenhaInimigos(inimigo *lista) {
     
 
     for (inimigo *id = lista; id != NULL; id = id->prox) {
-        al_draw_filled_rectangle(id->x-id->lado/2, id->y-id->lado/2, id->x+id->lado/2, id->y+id->lado/2, id->cor);
+        //al_draw_filled_rectangle(id->x-id->lado/2, id->y-id->lado/2, id->x+id->lado/2, id->y+id->lado/2, id->cor);
         if (id->tipo == 0)al_draw_bitmap(missel, id->x - 5, id->y - 5, 0);
         if (id->tipo == 1)al_draw_bitmap(inimigoScout, id->x - 33, id->y - 32, 0);
         if (id->tipo == 2)al_draw_bitmap(inimigoSoldier, id->x - 32, id->y - 32, 0);
