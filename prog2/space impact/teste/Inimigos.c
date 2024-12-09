@@ -185,7 +185,6 @@ void atualizaInimigos(inimigo **lista, jogador *jogador) {
         int chanceDeAtirar = (atual->tipo == 2) ? 1.5 : (atual->tipo == 3) ? 2.5 : 3.0;
         if (rand() % 100 < chanceDeAtirar && atual->tipo != 0) {
             inimigoAtira(atual);
-            atual->arma->tempo = REGARGA_PISTOLA;
         }
 
         if (colisaoInimigoJogador(atual, jogador)) {

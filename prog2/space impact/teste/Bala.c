@@ -46,12 +46,14 @@ void moveBalas(bala *balas) {
                 id->y += MOVI_BALA;
                 break;
             default:
+                id->x -= 2;
                 break;
         }
     }
 }
 
 void destroiBala(bala *elemento){
+    if (!elemento) return;
 
 	free(elemento);
 }

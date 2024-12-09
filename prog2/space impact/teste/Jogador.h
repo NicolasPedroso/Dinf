@@ -17,7 +17,7 @@ typedef struct {
 	pistola *arma;
 } jogador;
 
-jogador* criaJogador(unsigned char lado, unsigned char face, unsigned short x, unsigned short y, unsigned short max_x, unsigned short max_y);
+jogador* criaJogador(unsigned char vida, unsigned char lado, unsigned char face, unsigned short x, unsigned short y, unsigned short max_x, unsigned short max_y);
 void moveJogador(jogador *elemento, char passos, unsigned char trajetoria, unsigned short max_x, unsigned short max_y);
 unsigned char colisaoJogador(jogador *elemento_primeiro, jogador *elemento_segudo);
 void jogadorAtira(jogador *elemento, unsigned char trajetoria);

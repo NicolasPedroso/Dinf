@@ -1,6 +1,6 @@
 data ArvoreBin = NodoNull | NodoInt Int ArvoreBin ArvoreBin
       deriving Show
-
+----------------------------------
 passeio :: ArvoreBin -> [Int]
 
 passeio NodoNull = []
@@ -8,11 +8,11 @@ passeio NodoNull = []
 passeio (NodoInt a NodoNull NodoNull) = [a]
 
 passeio (NodoInt a esq dir) = [a] ++ passeio esq ++ passeio dir
-
+----------------------------------------------
 criaNodo :: Int -> ArvoreBin
 
 criaNodo a = (NodoInt a NodoNull NodoNull)
-
+-----------------------------------------------------
 insere :: Int -> ArvoreBin -> ArvoreBin
 
 insere x NodoNull = criaNodo x

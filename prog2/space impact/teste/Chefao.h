@@ -7,6 +7,7 @@
 #include <allegro5/allegro_primitives.h>
 
 #define RAIO_F 180
+#define CHACENCE_ATIRA_F 50
 
 
 #define VELOCIDADE_INIMIGO 7
@@ -20,7 +21,6 @@ typedef struct chefao {
 } chefao;
 
 chefao* criaChefao(int tipo, int x, int y);
-void destroiChefao(chefao *elemento);
 void chefaoAtira(chefao *elemento, unsigned char trajetoria);
 void atualizaBalasChefao(chefao *elemento);
 unsigned char colisaoChefaoJogador(chefao *chefao, jogador *jogador);

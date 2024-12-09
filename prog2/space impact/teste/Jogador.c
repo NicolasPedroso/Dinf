@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "Jogador.h"
 
-jogador* criaJogador(unsigned char lado, unsigned char face, unsigned short x, unsigned short y, unsigned short max_x, unsigned short max_y){
+jogador* criaJogador(unsigned char vida, unsigned char lado, unsigned char face, unsigned short x, unsigned short y, unsigned short max_x, unsigned short max_y){
 
 	if ((x - lado/2 < 0) || (x + lado/2 > max_x) || (y - lado/2 < 0) || (y + lado/2 > max_y)) return NULL;
 	if (face > 3) return NULL;
@@ -11,7 +11,7 @@ jogador* criaJogador(unsigned char lado, unsigned char face, unsigned short x, u
 	novoJogador->pontos = 0;
 	novoJogador->lado = lado;
 	novoJogador->face = face;
-	novoJogador->vida = 5;
+	novoJogador->vida = vida;
 	novoJogador->x = x;
 	novoJogador->y = y;
 	novoJogador->controle = criaControle();
@@ -162,6 +162,16 @@ void atualizaPosicao(jogador *jogador1, jogador *jogador2){
 	}
 	moveBalas(jogador1->arma->tiros);
 	moveBalas(jogador2->arma->tiros);
+
+	if(jogador1->vida <=0 ){
+		destroiPistola(jogador1->arma);
+		free(jogador1);
+	}
+
+	if(jogador2->vida <=0 ){
+		destroiPistola(jogador2->arma);
+		free(jogador2);
+	}
 }
 
 unsigned char veMortePVP(jogador *assassino, jogador *vitima){

@@ -18,6 +18,7 @@ bala* tiroPistola(unsigned short x, unsigned short y, unsigned char trajetoria, 
 }
 
 void destroiPistola(pistola *elemento){
+	if(!elemento) return;
 
 	bala *sentinela;
 	for (bala *id = elemento->tiros; id != NULL; id = sentinela){
