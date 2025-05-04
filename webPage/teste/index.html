@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nicolas Pedroso — Informática Biomédica</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Nicolas Pedroso</h1>
+      <nav>
+        <ul>
+          <li><a href="#sobre">Sobre</a></li>
+          <li><a href="#habilidades">Habilidades</a></li>
+          <li><a href="#projetos">Projetos</a></li>
+          <li><a href="#contato">Contato</a></li>
+          <li><button id="theme-toggle">🌙</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="sobre" class="section container">
+      <h2>Sobre Mim</h2>
+      <p>Sou um estudante de Informática Biomédica na UFPR, apaixonado por tecnologia, programação e o impacto da computação na saúde. Busco oportunidades para aplicar meus conhecimentos em projetos inovadores.</p>
+    </section>
+
+    <section id="habilidades" class="section container">
+      <h2>Habilidades</h2>
+      <div class="card-grid">
+        <div class="card">C/C++</div>
+        <div class="card">Python</div>
+        <div class="card">JavaScript</div>
+        <div class="card">HTML/CSS</div>
+        <div class="card">Linux</div>
+        <div class="card">Git e GitHub</div>
+      </div>
+    </section>
+
+    <section id="projetos" class="section container">
+      <h2>Projetos</h2>
+      <div class="card-grid">
+        <article class="card">
+          <h3>Detecção de Doenças</h3>
+          <p>Projeto de reconhecimento de padrões em exames utilizando machine learning.</p>
+        </article>
+        <article class="card">
+          <h3>Site da Empresa Júnior</h3>
+          <p>Desenvolvimento do site institucional da EJ de computação da UFPR.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contato" class="section container">
+      <h2>Contato</h2>
+      <form action="https://formsubmit.co/4d53acf302a05f6f01f0fdfec136fcfb" method="POST" id="contact-form">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+      
+        <input type="text" name="name" placeholder="Seu nome" required>
+        <input type="email" name="email" placeholder="Seu e-mail" required>
+        <textarea name="message" placeholder="Sua mensagem" required></textarea>
+      
+        <div class="g-recaptcha" 
+             data-sitekey="6LdPCS4rAAAAAB16u5OD5Xvpt4JYlfvimO79Wmdb"
+             data-callback="habilitarBotao"
+             data-expired-callback="desabilitarBotao"></div>
+      
+        <button type="submit" id="submitBtn" disabled>Enviar</button>
+      
+        <div id="form-success" style="display: none; color: var(--accent); font-weight: bold;">
+          ✅ Mensagem enviada com sucesso!
+        </div>
+      </form>
+      
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 Nicolas Pedroso — Informática Biomédica UFPR</p>
+      <div class="social-icons">
+        <a href="https://github.com/NicolasPedroso" target="_blank">GitHub</a>
+        <a href="https://linkedin.com/in/Nicolas-Gabriel-Ramos-Pedroso" target="_blank">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
