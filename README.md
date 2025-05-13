@@ -1,2 +1,2 @@
 # Dinf
-O que está no computador da faculdade
+Códigos de trabaho da faculdade e projetos pessoais 
